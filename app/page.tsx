@@ -8,17 +8,8 @@ export default function Home() {
           <div className="idsk-secondary-navigation__heading">
             <div className="idsk-secondary-navigation__heading-title">
               <span className="idsk-secondary-navigation__heading-mobile">SK</span>
-              <span className="idsk-secondary-navigation__heading-desktop">Oficiálna stránka</span>
 
-              <button
-                className="govuk-button govuk-button--texted--inverse idsk-secondary-navigation__heading-button"
-                aria-expanded="false"
-                aria-label="Oficiálna stránka verejnej správy"
-              >
-                <span className="idsk-secondary-navigation__heading-mobile">e-Gov</span>
-                <span className="idsk-secondary-navigation__heading-desktop"><b>verejnej správy</b></span>
-                <span className="material-icons">arrow_drop_down</span>
-              </button>
+             
             </div>
 
             <div className="idsk-secondary-navigation__body hidden" data-testid="secnav-children">
@@ -81,41 +72,59 @@ export default function Home() {
           title="Odkaz na titulnú stránku"
         >
           <img
-            src="/idsk-assets/images/logo-moje.png"
+            src="/idsk-assets/images/logo_upejesko.jpg"
             alt="Logo Škôlky s odkazom na titulnú stránku"
           />
+
         </a>
       </div>
 
-      <div className="govuk-header__btns-search">
+      <div className="govuk-header__btns-search" >
+        
+
         <div className="govuk-header__mobile-menu desktop-hidden">
-          <button
-            type="button"
-            className="govuk-header__menu-button font-bold govuk-js-header-toggle"
-            aria-controls="navigation"
-            hidden
-          >
-            Menu
-          </button>
+            <button type="button" className="govuk-header__menu-button font-bold govuk-js-header-toggle" aria-controls="navigation" hidden>
+              Menu
+            </button>
+            <div className="govuk-header__actionPanel mobile desktop-hidden">
+              <button className="govuk-button" title="Notifikácie"><span role="button" className="material-icons" aria-hidden="true">notifications</span></button>
+              <button className="govuk-button" title="Informácie o portáli"><span role="button" className="material-icons" aria-hidden="true">info</span></button>
+            </div>
         </div>
 
-        <div className="idsk-searchbar__wrapper" role="search">
-          <input
-            className="govuk-input"
-            type="search"
-            placeholder="Zadajte hľadaný výraz"
-            title="Zadajte hľadaný výraz"
-            name="search"
-          />
-          <button className="govuk-button govuk-button__basic" aria-label="Hľadať">
-            <span className="material-icons" aria-hidden="true">search</span>
-          </button>
-        </div>
-
-        <button className="govuk-button govuk-button__basic mobile-hidden">Prihlásiť</button>
-        <button className="govuk-button govuk-button__basic mobile-hidden">Registrovať</button>
-      </div>
+          <div className="idsk-searchbar__wrapper" role="search">
+            <input className="govuk-input" type="search" placeholder="Zadajte hľadaný výraz" title="Zadajte hľadaný výraz" name="search" />
+            <button className="govuk-button govuk-button__basic" aria-label="Hľadať"><span className="material-icons" aria-hidden="true">search</span></button>
+          </div>
+          <div className="govuk-header__actionPanel desktop mobile-hidden">
+            <button className="govuk-button" title="Notifikácie"><span role="button" className="material-icons" aria-hidden="true">notifications</span></button>
+            <button className="govuk-button" title="Informácie o portáli"><span role="button" className="material-icons" aria-hidden="true">info</span></button>
+            <button className="govuk-button govuk-header__profile_button" title="Profil">MM</button>
+          </div>
+        
+      
     </div>
+
+        <nav id="navigation" aria-label="Menu" className="govuk-header__navigation govuk-width-container">
+          <dialog id="navigationProfileDialog">
+            <div className="govuk-header__profile">
+              <div className="govuk-header__profile__header mobile-hidden">
+                <div className="govuk-heading-m">Profil</div>
+                <button className="govuk-button govuk-button--texted govuk-header__profile_close_button"><span className="material-icons">close</span></button>
+              </div>
+              <div className="govuk-header__profile__body">
+                <img className="profile" src="https://placehold.co/100x100/072C66/FFFFFF?text=JH" alt="Profile"/>
+                <h4 className="govuk-heading-l">Janko Hruska</h4>
+                <span>RČ 123456/1234</span>
+
+                <button className="govuk-button govuk-button__basic">Primárne tlačidlo</button>
+                <button className="govuk-button govuk-button--texted govuk-button--texted__warning">Textové tlačidlo</button>
+              </div>
+            </div>
+          </dialog>
+          </nav>
+  </div>
+
 
     <nav id="navigation" aria-label="Menu" className="govuk-header__navigation govuk-width-container">
       <span className="text">Menu</span>
@@ -155,69 +164,35 @@ export default function Home() {
             </a>
           </li>
 
-          <li className="govuk-header__navigation-item">
-            <div className="idsk-dropdown__wrapper jano" data-pseudolabel="položky">
-              <a
-                role="button"
-                href="#"
-                className="govuk-button govuk-button--texted idsk-dropdown"
-                aria-label="Rozbaliť položky"
-                aria-haspopup="listbox"
-              >
-                <span>Rozbaľovacia sekcia al la la</span>
-                <span className="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-              </a>
-              <ul className="idsk-dropdown__options idsk-shadow-medium">
-                <li className="idsk-dropdown__option idsk-pseudolabel__wrapper " data-pseudolabel="Podsekcia 1">
-                  <a href="#" lang="sk">Podsekcia 1</a>
-                </li>
-                <li className="idsk-dropdown__option idsk-pseudolabel__wrapper " data-pseudolabel="Podsekcia 2">
-                  <a href="#" lang="sk">Podsekcia 2</a>
-                </li>
-                <li className="idsk-dropdown__option idsk-pseudolabel__wrapper " data-pseudolabel="Podsekcia 3">
-                  <a href="#" lang="sk">Podsekcia 3</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-
-          <li className="govuk-header__navigation-item govuk-header__navigation-item--active">
-            <div className="idsk-dropdown__wrapper jano2" data-pseudolabel="položky">
-              <a
-                role="button"
-                href="#"
-                className="govuk-button govuk-button--texted idsk-dropdown"
-                aria-label="Rozbaliť položky"
-                aria-haspopup="listbox"
-              >
-                <span>Rozbaľovacia sekcia</span>
-                <span className="material-icons" aria-hidden="true">keyboard_arrow_down</span>
-              </a>
-              <ul className="idsk-dropdown__options idsk-shadow-medium">
-                <li className="idsk-dropdown__option idsk-pseudolabel__wrapper " data-pseudolabel="Podsekcia 1">
-                  <a href="#" lang="sk">Podsekcia 1</a>
-                </li>
-                <li
-                  className="idsk-dropdown__option idsk-pseudolabel__wrapper active"
-                  data-pseudolabel="Podsekcia 2"
-                >
-                  <a href="#" lang="sk">Podsekcia 2</a>
-                </li>
-                <li className="idsk-dropdown__option idsk-pseudolabel__wrapper " data-pseudolabel="Podsekcia 3">
-                  <a href="#" lang="sk">Podsekcia 3</a>
-                </li>
-              </ul>
-            </div>
-          </li>
+          
         </ul>
       </div>
 
-      <div className="btnWrapper desktop-hidden">
-        <button className="govuk-button govuk-button__basic">Tlačidlo1</button>
-        <button className="govuk-button govuk-button__basic">Tlačidlo2</button>
-      </div>
     </nav>
   </header>
+
+ <div className="govuk-main-wrapper govuk-width-container idsk-docs">
+  <div className="idsk-docs__wrap">
+    <span className="idsk-docs__divider" aria-hidden="true"></span>
+
+    <div className="idsk-docs__row">
+      <aside className="idsk-docs__sidenav" aria-label="Navigácia sekcií">
+        <ul className="idsk-docs__list govuk-list">
+          <li className="idsk-docs__item"><a className="idsk-docs__link.is-active" href="#jl">Jedálny lístok</a></li>
+          <li className="idsk-docs__item"><a className="idsk-docs__link" href="#od">Odhlasovanie</a></li>
+          <li className="idsk-docs__item"><a className="idsk-docs__link" href="#pt">Platby</a></li>
+        </ul>
+      </aside>
+      <main className="idsk-docs__content">
+        <h1 className="govuk-heading-xl">Jedálny lístok
+        </h1>
+      </main>
+
+    </div>
+  </div>
+
+</div>
+
 </div>
 
         
