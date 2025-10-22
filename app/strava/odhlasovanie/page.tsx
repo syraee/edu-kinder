@@ -1,5 +1,5 @@
-
 import Link from "next/link";
+
 export default function Home() {
   return (
     <>
@@ -127,10 +127,12 @@ export default function Home() {
             <div className="govuk-header__navigation-list">
               <ul>
                 <li
-                  className="govuk-header__navigation-item">
-                  <Link className="govuk-header__link" href="/strava/jedalny-listok" title="Strava">
+                  className="govuk-header__navigation-item govuk-header__navigation-item--active"
+                  aria-current="page"
+                >
+                  <a className="govuk-header__link" href="/strava/jedalny-listok" title="Strava">
                     Strava
-                  </Link>
+                  </a>
                 </li>
                 <li className="govuk-header__navigation-item">
                   <a className="govuk-header__link" href="#2" title="Fotogaléria">
@@ -161,10 +163,30 @@ export default function Home() {
       {/* BODY */}
       <div className="govuk-main-wrapper govuk-width-container idsk-docs">
         <div className="idsk-docs__wrap">
+          <span className="idsk-docs__divider" aria-hidden="true"></span>
 
           <div className="idsk-docs__row">
+            <aside className="idsk-docs__sidenav" aria-label="Navigácia sekcií">
+              <ul className="idsk-docs__list govuk-list">
+                <li className="idsk-docs__item">
+                  <Link className="idsk-docs__link" href="/strava/jedalny-listok" title='Jedálny lístok'>
+                    Jedálny lístok
+                  </Link>
+                </li>
+                <li className="idsk-docs__item">
+                  <Link className="idsk-docs__link is-active" href="/strava/odhlasovanie" title='Odhlasovanie'>
+                    Odhlasovanie
+                  </Link>
+                </li>
+                <li className="idsk-docs__item">
+                  <Link className="idsk-docs__link" href="/strava/platby" title='Platby'>
+                    Platby
+                  </Link>
+              </li>
+            </ul>
+            </aside>
             <main className="idsk-docs__content">
-              <h1 className="govuk-heading-xl">Hlavná obrazovka
+              <h1 className="govuk-heading-xl">Odhlasovanie
               </h1>
             </main>
           </div>
