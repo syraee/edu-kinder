@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-     "postinstall": "npm run copy-idsk-assets",
+    "postinstall": "npm run copy-idsk-assets",
     "copy-idsk-assets": "npm run copy-idsk-govuk && npm run copy-idsk-idsk && npm run copy-idsk-idsk-dist",
     "copy-idsk-govuk": "copyfiles -u 4 \"node_modules/@id-sk/frontend/govuk/assets/**/*\" public/idsk-assets",
     "copy-idsk-idsk": "copyfiles -u 4 \"node_modules/@id-sk/frontend/idsk/assets/**/*\" public/idsk-assets",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@id-sk/frontend": "^3.0.0-beta.0",
+    "cheerio": "^1.1.2",
     "next": "15.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",

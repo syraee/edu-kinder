@@ -1,3 +1,5 @@
+import PdfList from "./components/PdfList";
+
 export default function Home() {
   return (
     <>
@@ -172,12 +174,14 @@ export default function Home() {
               </ul>
             </aside>
             <main className="idsk-docs__content">
-              <h1 className="govuk-heading-xl">Jedálny lístok
-              </h1>
+              <h1 className="govuk-heading-xl">Jedálny lístok</h1>
+              <PdfList pageWithLinks="https://www.upjs.sk/app/uploads/sites/26/2025/10/20-24.10.2025.pdf" />
             </main>
           </div>
         </div>
       </div>
+      
+      
     </>
   );
 }
