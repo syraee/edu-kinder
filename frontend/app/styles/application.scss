@@ -1,5 +1,6 @@
 $govuk-assets-path: "/idsk-assets/";
 @import "@id-sk/frontend/dist/govuk/all";
+@import "./menu.scss";
 
 .idsk-docs__row {
   display: grid;
@@ -56,7 +57,7 @@ $govuk-assets-path: "/idsk-assets/";
   text-decoration: none;
   border-left: 4px solid #0b4199;
   padding-left: 8px;
-  color: #072C66;
+  color: #072c66;
 }
 
 .idsk-docs__content {
