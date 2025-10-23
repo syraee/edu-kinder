@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ebd9120c-652f-47dc-a41e-00d97df72f55" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/$null" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/scrape/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/IdskInit.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/PdfList.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/strava/jedalny-listok/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/strava/odhlasovanie/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/strava/platby/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/styles/application.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eslint.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/file.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/globe.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/SourceSansPro-Black.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/SourceSansPro-Black.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/SourceSansPro-Bold.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/SourceSansPro-Bold.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/SourceSansPro-Regular.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/SourceSansPro-Regular.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/material-icon/material-icons-outlined.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/material-icon/material-icons-outlined.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/material-icon/material-icons.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/fonts/material-icon/material-icons.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-crest-2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-crest.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-icon-180.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-icon-192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-icon-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-icon-mask.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/govuk-opengraph-image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/logo-moje.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/logo_upejesko.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/images/placeholder.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/idsk-assets/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/next.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vercel.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/window.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/idsk-frontend.d.ts" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="NodeJS-config" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="34SfWc8xEt3HXd4ofUcnQWy3mmp" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "IDSKconfig",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.26830.93" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ebd9120c-652f-47dc-a41e-00d97df72f55" name="Changes" comment="" />
+      <created>1761211926704</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1761211926704</updated>
+      <workItem from="1761211927972" duration="1072000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
