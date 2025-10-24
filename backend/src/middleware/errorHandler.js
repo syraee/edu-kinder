@@ -1,4 +1,4 @@
-function errorHandler(err, req, res, next) {
+function errorHandler(err, req, res) {
     console.error(err.stack);
 
     const statusCode = err.statusCode || 500; // default 500
