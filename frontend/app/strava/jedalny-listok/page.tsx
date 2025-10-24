@@ -1,4 +1,4 @@
-import PdfList from '@/app/components/PdfList';
+import MenuDisplay from '@/app/components/MenuDisplay';
 import Link from 'next/link';
 
 export default function Home() {
@@ -176,7 +176,7 @@ export default function Home() {
             </aside>
             <main className="idsk-docs__content">
               <h1 className="govuk-heading-xl">Jedálny lístok</h1>
-              <PdfList pageWithLinks="https://www.upjs.sk/app/uploads/sites/26/2025/10/20-24.10.2025.pdf" />
+              <MenuDisplay pdfUrl="https://www.upjs.sk/app/uploads/sites/26/2025/10/20-24.10.2025.pdf" />
             </main>
           </div>
         </div>

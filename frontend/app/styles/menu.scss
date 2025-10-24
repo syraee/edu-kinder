@@ -1,0 +1,261 @@
+// Menu Display Styles - Black & White Design
+.menu-display {
+  margin-top: 20px;
+
+  .menu-header {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-left: 4px solid #000;
+    border-radius: 0;
+  }
+
+  .menu-table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+    background: white;
+    border: 3px solid #000;
+  }
+
+  .menu-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+
+    thead {
+      th {
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: 700;
+        border: 2px solid #000;
+        border-bottom: 3px solid #000;
+        color: #000;
+        font-size: 12px;
+        background: #fff;
+      }
+    }
+
+    tbody {
+      // Group rows by day - add spacing between days
+      tr {
+        &:first-child td {
+          border-top: 2px solid #000;
+        }
+      }
+
+      td {
+        padding: 6px 8px;
+        border-left: 2px solid #000;
+        border-right: 2px solid #000;
+        border-bottom: 2px solid #000;
+        vertical-align: top;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .menu-date-cell {
+    background: #fff;
+    text-align: center;
+    font-weight: 700;
+    min-width: 100px;
+    padding: 12px 8px !important;
+    color: #000;
+    border-right: 2px solid #000 !important;
+
+    .menu-date-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+
+      strong {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.3;
+      }
+
+      div {
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 1.3;
+      }
+
+      small {
+        display: block;
+        font-size: 10px;
+        color: #333;
+        font-weight: 400;
+        margin-top: 2px;
+        line-height: 1.2;
+      }
+
+      .govuk-tag {
+        display: none;
+      }
+    }
+  }
+
+  .menu-dish-cell {
+    text-align: left;
+    min-width: 180px;
+    background: white;
+    padding-left: 10px !important;
+    border-right: 2px solid #000 !important;
+  }
+
+  .menu-portion-cell {
+    text-align: center;
+    min-width: 60px;
+    font-weight: 400;
+    background: white;
+    font-size: 12px;
+    border-right: 2px solid #000 !important;
+  }
+
+  .menu-allergen-cell {
+    text-align: center;
+    min-width: 40px;
+    color: #d4351c;
+    font-weight: 700;
+    background: white;
+    font-size: 12px;
+    border-right: 2px solid #000 !important;
+  }
+
+  .menu-footer {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f8f8;
+    border-left: 4px solid #000;
+
+    .govuk-inset-text {
+      border-left-color: #000;
+      background: white;
+    }
+  }
+}
+
+// Loading State
+.menu-loading {
+  padding: 40px 20px;
+  text-align: center;
+  color: #505a5f;
+
+  .material-icons {
+    animation: spin 2s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Error State
+.menu-error {
+  margin: 20px 0;
+}
+
+// Mobile Optimizations
+@media (max-width: 767px) {
+  .menu-display {
+    .menu-header {
+      padding: 15px;
+
+      .govuk-grid-row {
+        display: block;
+
+        .govuk-grid-column-one-third {
+          margin-top: 15px;
+          text-align: left !important;
+        }
+      }
+    }
+
+    .menu-table-container {
+      border: 2px solid #000;
+    }
+
+    .menu-table {
+      font-size: 11px;
+
+      thead th {
+        padding: 8px 4px;
+        font-size: 10px;
+        border: 1px solid #000;
+      }
+
+      tbody td {
+        padding: 6px 4px;
+        border: 1px solid #000;
+      }
+
+      .menu-date-cell {
+        min-width: 80px;
+        font-size: 11px;
+        padding: 8px 4px !important;
+        border-right: 1px solid #000 !important;
+
+        .menu-date-content {
+          strong {
+            font-size: 12px;
+          }
+          div {
+            font-size: 10px;
+          }
+          small {
+            font-size: 9px;
+          }
+        }
+      }
+
+      .menu-dish-cell {
+        min-width: 120px;
+      }
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .menu-display {
+    .menu-header {
+      background-color: transparent;
+      border: 1px solid #000;
+    }
+
+    .menu-table-container {
+      border: 2px solid #000;
+    }
+
+    .menu-table {
+      page-break-inside: auto;
+
+      thead th {
+        border: 1px solid #000;
+        background: #fff !important;
+      }
+
+      tbody td {
+        border: 1px solid #000;
+      }
+
+      .menu-date-cell {
+        background: #fff !important;
+      }
+    }
+
+    .govuk-button {
+      display: none;
+    }
+  }
+}
