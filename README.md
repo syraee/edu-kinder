@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Frontend (Next.js)
+
 First, run the development server:
 
 ```bash
@@ -19,6 +21,33 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+
+## Backend (Node.js + Express)
+
+1. Navigate to the backend folder:
+
+```bash
+cd backend
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the server in development mode
+
+```bash
+npm run dev
+```
+
+By default, the backend runs on http://localhost:5000
+.
+You should see:
+
+Server running on port 5000
 
 ## Learn More
 
