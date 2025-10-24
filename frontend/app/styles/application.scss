@@ -57,7 +57,7 @@ $govuk-assets-path: "/idsk-assets/";
   text-decoration: none;
   border-left: 4px solid #0b4199;
   padding-left: 8px;
-  color: #072c66;
+  color: #072C66;
 }
 
 .idsk-docs__content {
@@ -190,4 +190,225 @@ $govuk-assets-path: "/idsk-assets/";
 .govuk-button.next {
   display: block;
   margin: 32px auto 0;
+}
+
+.attendance {
+  --blue-bg:   #C3D9F9;
+  --blue-fg:   #126DFF;
+  --orange-bg: #fdecc8;
+  --orange-fg: #b45309;
+  --red-bg:    #fee2e2;
+  --red-fg:    #b91c1c;
+  --today-bg:  #f3e8d7;
+  --outside-bg:#C8C8C8;
+  --focus:     #ffdd00;
+
+  .topbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .child-switch {
+    display: flex;
+    gap: 8px;
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 9999px;
+      padding: 6px 12px;
+      margin: 0;
+    }
+    .pill.is-active {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
+    }
+  }
+
+  .month-nav {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 12px;
+
+  .govuk-button { margin: 0; }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+    box-sizing: border-box;
+    font-size: 18px;
+  }
+
+  .month-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    justify-self: center;
+  }
+}
+
+  .weekday-grid,
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .weekday-grid { margin-top: 8px; margin-bottom: 10px; }
+  .weekday {
+    color: #6b7280;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .day-card {
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background: #fff;
+    color: #111827;
+    padding: 10px 6px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-height: 84px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    transition: transform .06s ease, box-shadow .06s ease;
+  }
+  .day-card:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+
+  .day-number { font-weight: 700; font-size: 18px; }
+  .day-status { font-size: 14px; color: #1f2937; }
+
+  .day-card.is-all   { background: var(--blue-bg);   }
+  .day-card.is-all   .day-number { color: var(--blue-fg); }
+
+  .day-card.is-some  { background: var(--orange-bg); }
+  .day-card.is-some  .day-number { color: var(--orange-fg); }
+
+  .day-card.is-none  { background: var(--red-bg);    }
+  .day-card.is-none  .day-number { color: var(--red-fg); }
+
+  .day-card.is-outside { background: var(--outside-bg); border-color: #ccead8; }
+  .day-card.is-today   { outline: 2px solid #d6b389; }
+
+  .day-card:focus {
+    box-shadow: 0 0 0 3px #0b0c0c, 0 0 0 6px var(--focus);
+    outline: none;
+  }
+
+  .attendance-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(880px, 92vw);
+      background: #fff;
+      border: 2px solid #1d4ed8;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .btn-icon.close {
+      min-width: 36px;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .meal-grid {
+      display: grid;
+      grid-template-columns: 1.2fr repeat(4, 1fr);
+      column-gap: 18px;
+      row-gap: 16px;
+      align-items: center;
+      grid-auto-rows: minmax(44px, auto);
+
+      .g-head { font-weight: 700; text-align: center; justify-self: center; }
+
+      .g-name { font-weight: 600; justify-self: start; }
+
+      .g-row { display: contents; }
+
+      .tick { justify-self: center; display: inline-flex; }
+    }
+
+    .tick { display: flex; justify-content: center; }
+    .tick input {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+    .tick span {
+      width: 28px; height: 28px;
+      border: 2px solid #1d4ed8;
+      border-radius: 6px;
+      display: inline-grid;
+      place-items: center;
+      background: #fff;
+      transition: background .1s ease, border-color .1s ease;
+    }
+    .tick input:checked + span { background: #e8f0ff; }
+    .tick input:checked + span::after {
+      content: "✓";
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+    }
+  }
+
+  .material-icons { font-size: 18px; line-height: 1; }
+
+  @media (max-width: 720px) {
+    .day-card { min-height: 72px; }
+    .day-number { font-size: 16px; }
+    .day-status { font-size: 13px; }
+    .attendance-modal .meal-grid { column-gap: 12px; row-gap: 12px; }
+  }
 }
