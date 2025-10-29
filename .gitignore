@@ -2,7 +2,7 @@
 # IDE / Editor
 # ------------------------
 .vscode/
-.idea/
+.idea
 
 # ------------------------
 # Node.js dependencies
