@@ -1,21 +1,17 @@
 const express = require("express");
 const router = express.Router();
+const prisma = require("../../prisma/client");
 
-router.get("/", (req, res, next) => {
+// GET /api/users - vráti všetkých používateľov
+router.get("/", async (req, res, next) => {
     try {
-        const fail = false;
-        if (fail) {
-            const error = new Error("Failed to fetch users");
-            error.statusCode = 400;
-            return next(error);
-        }
-
+        const users = await prisma.user.findMany(); // všetci users z DB
         res.json({
             success: true,
-            data: ["Alice", "Bob", "Charlie"]
+            data: users
         });
     } catch (err) {
-        next(err); // všetky neočakávané chyby posielame do error handlera
+        next(err); // pošli chybu do globálneho error handlera
     }
 });
 
