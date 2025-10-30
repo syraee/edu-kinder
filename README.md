@@ -43,7 +43,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
   npm run dev
 ```
 
-By default, the backend runs on http://localhost:5000
+By default, the backend runs on http://localhost:5000/api 
 .
 You should see:
 
@@ -58,8 +58,12 @@ for database management. Follow these steps to set it up locally:
 
    1. Docker 
    2. Node.js and npm
-   3. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
-   
+   3. Install Prisma client
+      ```bash
+         npm install prisma @prisma/client
+      ```
+   4. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
+
 2. Start PostgreSQL
     In the backend folder, there is a docker-compose.yml file. Run:
 
