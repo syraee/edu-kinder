@@ -431,6 +431,18 @@ $govuk-assets-path: "/idsk-assets/";
   margin-left: 20%;
 }
 
+.auth-center {
+   min-height: calc(100dvh - 160px);
+   display: grid;
+   place-items: center;
+   padding-block: 2rem;
+ }
+   .auth-form {
+     width: 100%;
+     max-width: 28rem;
+     margin-inline: auto;
+   }
+
 .invite-list { margin: 0; }
                 .invite-list .govuk-summary-list__row {
                   display: grid;
