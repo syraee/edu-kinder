@@ -187,10 +187,10 @@ export default function InviteParentsPage() {
                 </Link>
               </li>
               <li className="govuk-header__navigation-item">
-                <a className="govuk-header__link" href="#2" title="Fotogaléria">
-                  Fotogaléria
-                </a>
-              </li>
+                  <Link className="govuk-header__link" href="/gallery" title="Fotogaléria">
+                    Fotogaléria
+                  </Link>
+                </li>
               <li className="govuk-header__navigation-item">
                 <a className="govuk-header__link" href="#3" title="Dochádzka">
                   Dochádzka

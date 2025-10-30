@@ -40,3 +40,80 @@ a {
     color-scheme: dark;
   }
 }
+
+/* gallery.css – štýly pre IDSK3 fotogalériu */
+
+.gallery-page {
+  padding: 2rem 0;
+}
+
+.gallery-album {
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.gallery-album:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.album-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #003078; /* IDSK modrá */
+  color: white;
+  padding: 1rem 1.5rem;
+}
+
+.album-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.album-date {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.album-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+  padding: 1rem;
+  background: white;
+}
+
+.album-photo {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.album-photo:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responzívne prispôsobenie */
+@media (max-width: 768px) {
+  .album-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .album-title {
+    font-size: 1.25rem;
+  }
+
+  .album-photo {
+    height: 180px;
+  }
+}

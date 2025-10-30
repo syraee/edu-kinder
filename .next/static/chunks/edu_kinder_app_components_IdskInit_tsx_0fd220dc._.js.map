@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/macko/edu_kinder/app/components/IdskInit.tsx"],"sourcesContent":["'use client';\r\nimport { useEffect } from 'react';\r\n\r\nexport default function IdskInit() {\r\n  useEffect(() => {\r\n    (async () => {\r\n      const mod: any = await import('@id-sk/frontend/dist/govuk/all.mjs');\r\n      const initAll = mod?.initAll ?? mod?.default?.initAll ?? mod?.GOVUKFrontend?.initAll;\r\n      if (typeof initAll === 'function') initAll();\r\n      else console.warn('initAll nebolo nájdené', mod);\r\n    })();\r\n  }, []);\r\n  return null;\r\n}\r\n"],"names":[],"mappings":";;;;AACA;;AADA;;AAGe,SAAS;;IACtB,IAAA,wLAAS;8BAAC;YACR;sCAAC;wBAEiC,cAAyB;oBADzD,MAAM,MAAW;wBACD,cAAA;oBAAhB,MAAM,UAAU,CAAA,OAAA,AAFlB,CAEkB,eAAA,gBAAA,0BAAA,IAAK,OAAO,AAG7B,cAHiB,0BAAA,eAAgB,gBAAA,2BAAA,eAAA,IAAK,OAAO,cAAZ,mCAAA,aAAc,OAAO,cAArC,kBAAA,OAAyC,gBAAA,2BAAA,qBAAA,IAAK,aAAa,cAAlB,yCAAA,mBAAoB,OAAO;oBACpF,IAAI,OAAO,YAAY,YAAY;yBAC9B,QAAQ,IAAI,CAAC,0BAA0B;gBAC9C;;QACF;6BAAG,EAAE;IACL,OAAO;AACT;GAVwB;KAAA","debugId":null}}]
+}
