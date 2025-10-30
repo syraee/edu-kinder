@@ -155,6 +155,11 @@ export default function Home() {
                     Oznamy
                   </a>
                 </li>
+                <li className="govuk-header__navigation-item">
+                  <a className="govuk-header__link" href="/admin-dashboard" title="Registracia">
+                    Registracia Uživateľov
+                  </a>
+                </li>
               </ul>
             </div>
           </nav>

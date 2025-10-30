@@ -430,3 +430,41 @@ $govuk-assets-path: "/idsk-assets/";
 .govuk-grid-column-two-thirds {
   margin-left: 20%;
 }
+
+.invite-list { margin: 0; }
+                .invite-list .govuk-summary-list__row {
+                  display: grid;
+                  grid-template-columns: 1fr auto auto;
+                  gap: 12px;
+                  align-items: center;
+                  padding: 12px 16px;
+                  border: 1px solid #d6d5d0;
+                  border-radius: 8px;
+                  background: #fff;
+                  margin: 0 0 8px 0;
+                  border-bottom: 0 !important;
+                  box-shadow: 0 1px 0 rgba(0,0,0,.03);
+                }
+                .invite-list .govuk-summary-list__key,
+                .invite-list .govuk-summary-list__value,
+                .invite-list .govuk-summary-list__actions { padding: 0; margin: 0; }
+                .invite-list .govuk-summary-list__key { font-weight: 600; word-break: break-all; }
+                .invite-list .govuk-tag {
+                  display: inline-block;
+                  padding: 2px 10px;
+                  border-radius: 9999px;
+                  background: #e7f0fb; 
+                  color: #003078;
+                  border: 1px solid #99b3d0;
+                  line-height: 1.6;
+                }
+                .invite-remove {
+                  font: inherit;
+                  background: transparent;
+                  border: 1px solid #072C66;
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                }
+                .invite-remove:hover { background: #d8dde0; }
+                .invite-remove:focus { outline: 3px solid #d96e00; outline-offset: 0; }
