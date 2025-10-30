@@ -412,3 +412,21 @@ $govuk-assets-path: "/idsk-assets/";
     .attendance-modal .meal-grid { column-gap: 12px; row-gap: 12px; }
   }
 }
+
+.govuk-header__actionPanel .govuk-button-prihlasenie {
+  background-color: #072C66;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  min-width: 140px;
+  line-height: 1;
+  border-radius: 10px;
+
+
+}
+
+.govuk-grid-column-two-thirds {
+  margin-left: 20%;
+}

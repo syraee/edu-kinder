@@ -91,19 +91,23 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="idsk-searchbar__wrapper" role="search">
-                <input className="govuk-input" type="search" placeholder="Zadajte hľadaný výraz" title="Zadajte hľadaný výraz" name="search" />
-                <button className="govuk-button govuk-button__basic" aria-label="Hľadať"><span className="material-icons" aria-hidden="true">search</span></button>
-              </div>
-              <div className="govuk-header__actionPanel desktop mobile-hidden">
-                <button className="govuk-button" title="Notifikácie"><span role="button" className="material-icons" aria-hidden="true">notifications</span></button>
-                <button className="govuk-button" title="Informácie o portáli"><span role="button" className="material-icons" aria-hidden="true">info</span></button>
-                <button className="govuk-button govuk-header__profile_button" title="Profil">MM</button>
-              </div>
+                <div className="govuk-header__actionPanel desktop mobile-hidden">
+                    <button className="govuk-button" title="Notifikácie"><span role="button" className="material-icons"
+                                                                               aria-hidden="true">notifications</span>
+                    </button>
+                    <Link
+                        href="/login"
+                        className="govuk-button-prihlasenie govuk-button mobile-hidden"
+                        data-module="govuk-button"
+                    >
+                        Prihlásenie
+                    </Link>
+                    {/*<button className="govuk-button govuk-header__profile_button" title="Profil">MM</button>*/}
+                </div>
             </div>
           </div>
 
-          <nav id="navigation" aria-label="Menu" className="govuk-header__navigation govuk-width-container">
+            {/* <nav id="navigation" aria-label="Menu" className="govuk-header__navigation govuk-width-container">
             <dialog id="navigationProfileDialog">
               <div className="govuk-header__profile">
                 <div className="govuk-header__profile__header mobile-hidden">
@@ -120,7 +124,7 @@ export default function Home() {
                 </div>
               </div>
             </dialog>
-          </nav>
+          </nav>*/}
 
           <nav id="navigation" aria-label="Menu" className="govuk-header__navigation govuk-width-container">
             <span className="text">Menu</span>
