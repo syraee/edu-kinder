@@ -60,9 +60,13 @@ for database management. Follow these steps to set it up locally:
    2. Node.js and npm
    3. Install Prisma client
       ```bash
-         npm install prisma @prisma/client
+        npm install prisma @prisma/client
       ```
-   4. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
+   4. For writing API docs install swagger:
+      ```bash
+        npm install swagger-ui-express
+      ```
+   5. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
 
 2. Start PostgreSQL
     In the backend folder, there is a docker-compose.yml file. Run:

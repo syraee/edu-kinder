@@ -16,8 +16,25 @@ router.get("/", async (req, res, next) => {
 });
 
 // POST /api/users
-router.post("/", (req, res) => {
-    res.send("User created");
+router.post("/", async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+
+        const newUser = await prisma.user.create({
+            data: {
+                email,
+                active: false,
+            },
+        });
+
+        res.status(201).json(newUser);
+    } catch (err) {
+        next(err);
+    }
 });
 
 module.exports = router;
