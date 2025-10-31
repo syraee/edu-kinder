@@ -81,7 +81,7 @@
         }
       }
     },
-    "/api/register/send-mail": {
+    "/api/auth/send-mail": {
       "post": {
         "summary": "Posli email pouzivatelovi na registraciu do systtemu",
         "requestBody": {

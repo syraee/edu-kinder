@@ -6,6 +6,6 @@ const auth = require("./authRoutes");
 
 
 router.use("/users", userRoutes);
-router.use("/register", auth);
+router.use("/auth", auth);
 
 module.exports = router;
