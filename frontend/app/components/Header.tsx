@@ -160,9 +160,14 @@ export default function Header() {
                     Oznamy
                   </a>
                 </li>
+                 <li className="govuk-header__navigation-item">
+                  <a className="govuk-header__link" href="/kids" title="kids-chart">
+                    Deti
+                  </a>
+                </li>
                 <li className="govuk-header__navigation-item">
-                  <a className="govuk-header__link" href="/admin-dashboard" title="Registracia">
-                    Registracia používateľov
+                  <a className="govuk-header__link" href="/parents" title="parents-chart">
+                    Rodičia
                   </a>
                 </li>
               </ul>
