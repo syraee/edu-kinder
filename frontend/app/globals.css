@@ -1,14 +1,28 @@
+/* Zabezpečí, že appka ignoruje dark mode z OS */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light only;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
+/* Vynútime svetlé pozadie pre všetky prvky */
+html, body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Ak browser aplikuje forced dark theme */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  img, svg {
+    filter: none !important;
   }
 }
+
 
 html,
 body {

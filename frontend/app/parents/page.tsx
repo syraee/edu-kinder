@@ -40,9 +40,7 @@ export default function ParentsPage() {
   return (
     <>
       <Header />
-
       
-
       <div className="govuk-width-container" style={{ marginTop: "2rem" }}>
         <h1 className="govuk-heading-xl">Rodičia</h1>
             <Link href="/admin-dashboard" className="govuk-button" role="button" data-module="govuk-button">

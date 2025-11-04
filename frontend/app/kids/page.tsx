@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Header from '@/app/components/Header';
+import Link from "next/link";
 
 type Child = {
   id: number;
@@ -13,11 +14,8 @@ type Child = {
 
 export default function StudentsPage() {
   const [activeClass, setActiveClass] = useState("Všetci");
-
-  // 🔹 Pridaná záložka "Všetci"
   const classes = ["Všetci", "Včielky", "Lienky", "Motýliky"];
 
-  // Mockované dáta
   const children: Child[] = [
     { id: 1, name: "Adam Novák", age: 5, class: "Včielky", group: "A" },
     { id: 2, name: "Ema Horváthová", age: 6, class: "Včielky", group: "B" },
@@ -26,7 +24,7 @@ export default function StudentsPage() {
     { id: 5, name: "Nina Sládková", age: 6, class: "Motýliky", group: "B" },
   ];
 
-  // 🔹 Ak je aktívna trieda "Všetci", vráti všetky deti
+ 
   const filtered =
     activeClass === "Všetci"
       ? children
@@ -37,6 +35,10 @@ export default function StudentsPage() {
       <Header />
 
       <div className="govuk-width-container idsk-students" style={{ marginTop: "2rem" }}>
+        <h1 className="govuk-heading-xl">Deti</h1>
+        <Link href="/kids-form" className="govuk-button" role="button" data-module="govuk-button">
+                Pridať dieťa
+            </Link>
         {/* Tabs pre triedy */}
         <div className="idsk-tabs">
           <ul className="idsk-tabs__list">
@@ -54,7 +56,7 @@ export default function StudentsPage() {
           </ul>
         </div>
 
-        {/* Zoznam detí */}
+        {/* Zoznam deti */}
         <div className="students-grid">
           {filtered.map((child) => (
             <div key={child.id} className="student-card govuk-!-margin-top-4">
