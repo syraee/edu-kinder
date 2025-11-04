@@ -6,7 +6,7 @@ const authRoutes = require("./authRoutes");
 const childRoutes = require("./childRoutes");
 
 
-router.use("/users", userRoutes);
+router.use("/user", userRoutes);
 router.use("/auth", authRoutes);
 router.use("/child", childRoutes);
 
