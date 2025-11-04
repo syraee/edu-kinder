@@ -40,8 +40,8 @@ model Child {
   firstName String
   lastName  String
   startDate DateTime
-  groupId   Int
-  birthday  DateTime
+  groupId   Int?
+  birthday  DateTime?
   createdAt DateTime   @default(now())
 
   guardians ChildGuardian[]
