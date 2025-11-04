@@ -453,10 +453,10 @@ export default function Home() {
                     Strava
                   </a>
                 </li>
-                <li className="govuk-header__navigation-item">
-                  <a className="govuk-header__link" href="#2" title="Fotogaléria">
+                 <li className="govuk-header__navigation-item">
+                  <Link className="govuk-header__link" href="/gallery" title="Fotogaléria">
                     Fotogaléria
-                  </a>
+                  </Link>
                 </li>
                 <li className="govuk-header__navigation-item">
                   <a className="govuk-header__link" href="#3" title="Dochádzka">
