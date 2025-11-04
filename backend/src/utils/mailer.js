@@ -11,8 +11,8 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function sendVerificationEmail(to, token) {
-    const verifyLink = `http://localhost:3000/registration`;
+export async function sendInvitationMail(to, token) {
+    const invLink = `http://localhost:3000/registration?token=${token}`;
 
     const mailOptions = {
         from: `"EDUkinder" <${process.env.SMTP_USER}>`,
@@ -20,8 +20,8 @@ export async function sendVerificationEmail(to, token) {
         subject: "Overenie e-mailu",
         html: `
       <h2>Vitaj v EDUkinder!</h2>
-      <p>Pre overenie svojho účtu klikni na tento odkaz:</p>
-      <a href="${verifyLink}" target="_blank">Registračný formulár</a>
+      <p>Pre zaregistrovanie svojho účtu rodica klikni na tento odkaz:</p>
+      <a href="${invLink}" target="_blank">Registračný formulár</a>
       <p>Ak si sa neregistroval ty, tento e-mail môžeš ignorovať.</p>
     `,
     };

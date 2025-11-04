@@ -15,12 +15,13 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
-  firstName String
-  lastName  String
-  role      Role      @relation(fields: [roleId], references: [id])
-  roleId    Int
+  firstName String?
+  lastName  String?
+  role      Role?      @relation(fields: [roleId], references: [id])
+  roleId    Int?
   email     String    @unique
   active    Boolean
+  phone     String?
   createdAt DateTime  @default(now())
 
   children  ChildGuardian[]
@@ -39,7 +40,8 @@ model Child {
   firstName String
   lastName  String
   startDate DateTime
-  groupId   Int
+  groupId   Int?
+  birthday  DateTime?
   createdAt DateTime   @default(now())
 
   guardians ChildGuardian[]

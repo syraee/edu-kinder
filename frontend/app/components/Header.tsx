@@ -136,7 +136,7 @@ export default function Header() {
               <ul>
                 <li
                   className="govuk-header__navigation-item">
-                  <Link className="govuk-header__link" href="/strava/jedalny-listok" title="Strava">
+                  <Link className="govuk-header__link" href="/meals/menu" title="Strava">
                     Strava
                   </Link>
                 </li>

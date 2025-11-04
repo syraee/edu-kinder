@@ -15,9 +15,9 @@ export default function Home() {
           <div className="idsk-docs__row">
             <aside className="idsk-docs__sidenav" aria-label="Navigácia sekcií">
               <ul className="idsk-docs__list govuk-list">
-                <li className="idsk-docs__item"><a className="idsk-docs__link is-active" href="/strava/jedalny-listok">Jedálny lístok</a></li>
-                <li className="idsk-docs__item"><a className="idsk-docs__link" href="/strava/odhlasovanie">Odhlasovanie</a></li>
-                <li className="idsk-docs__item"><a className="idsk-docs__link" href="/strava/platby">Platby</a></li>
+                <li className="idsk-docs__item"><a className="idsk-docs__link is-active" href="/meals/menu">Jedálny lístok</a></li>
+                <li className="idsk-docs__item"><a className="idsk-docs__link" href="/meals/meal-cancellation">Odhlasovanie</a></li>
+                <li className="idsk-docs__item"><a className="idsk-docs__link" href="/meals/payments">Platby</a></li>
               </ul>
             </aside>
             <main className="idsk-docs__content">
