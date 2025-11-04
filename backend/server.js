@@ -1,18 +1,22 @@
+require("dotenv").config()
 const express = require("express");
-const app = express();
 const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require('./swagger.json');
-
-const PORT = process.env.PORT || 5000;
-
-// Requires
 const routes = require("./src/routes/routes");
 const errorHandler = require("./src/middleware/errorHandler");
+const swaggerFile = require("./swagger-output.json"); // <-- vygenerovaný súbor
+
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 //Middleware
 app.use(express.json());
 app.use("/api", routes);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+app.get("/", (req, res) => {
+    res.redirect("/api-docs");
+});
+
 
 //Error handler
 app.use(errorHandler);

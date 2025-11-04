@@ -41,7 +41,7 @@ model Child {
   lastName  String
   startDate DateTime
   groupId   Int
-  birthday  DateTime?
+  birthday  DateTime
   createdAt DateTime   @default(now())
 
   guardians ChildGuardian[]

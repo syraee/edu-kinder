@@ -2,21 +2,29 @@ const express = require("express");
 const router = express.Router();
 const prisma = require("../../prisma/client");
 
-// GET /api/users - vráti všetkých používateľov
+
 router.get("/", async (req, res, next) => {
+    // #swagger.tags = ['Users']
+    // #swagger.summary = 'Get all users'
+    // #swagger.description = 'Fetches all users from the database'
+
     try {
-        const users = await prisma.user.findMany(); // všetci users z DB
+        const users = await prisma.user.findMany();
         res.json({
             success: true,
             data: users
         });
     } catch (err) {
-        next(err); // pošli chybu do globálneho error handlera
+        next(err);
     }
 });
 
 // POST /api/users
 router.post("/", async (req, res, next) => {
+    // #swagger.tags = ['Users']
+    // #swagger.summary = 'Create a new user'
+    // #swagger.description = 'Create a new user'
+
     try {
         const { email } = req.body;
 
