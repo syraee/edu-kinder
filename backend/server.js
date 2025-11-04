@@ -3,7 +3,7 @@ const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const routes = require("./src/routes/routes");
 const errorHandler = require("./src/middleware/errorHandler");
-const swaggerFile = require("./swagger-output.json"); // <-- vygenerovaný súbor
+const swaggerFile = require("./swagger-output.json");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
