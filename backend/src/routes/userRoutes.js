@@ -116,6 +116,10 @@ router.patch("/:id", async (req, res, next) => {
 
 // DELETE /api/users/:id
 router.delete("/:id", async (req, res, next) => {
+    // #swagger.tags = ['Users']
+    // #swagger.summary = 'Delete user'
+    // #swagger.description = 'Delete user by Id'
+
     try {
         const id = req.params['id'];
         const userId = parseInt(id, 10);

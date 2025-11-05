@@ -46,13 +46,21 @@ You should see:
 
 Server running on port 5000
 
-(Optional) - For writing API docs install swagger and swagger-autogen:
-   ```bash
-     npm install swagger-ui-express
-   ```
-   ```bash
-     npm install swagger-autogen
-   ```
+(Optional) - For writing API docs install swagger and swagger-autogen: 
+```bash
+  cd backend
+```
+```bash
+  npm install swagger-ui-express
+``` 
+
+```bash
+  npm install swagger-autogen
+```
+If you want to create new docs for endpoints type:
+```bash
+  node swagger.js
+```
 
 ## Database
 
