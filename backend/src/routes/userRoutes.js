@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../../prisma/client");
+const {authenticate} = require("../middleware/authenticate");
+const {authorizeRole} = require("../middleware/authorizeRole");
 
 // GET /api/user
 router.get("/", async (req, res, next) => {
@@ -115,7 +117,7 @@ router.patch("/:id", async (req, res, next) => {
 });
 
 // DELETE /api/users/:id
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", authenticate, authorizeRole(["admin"]), async (req, res, next) => {
     // #swagger.tags = ['Users']
     // #swagger.summary = 'Delete user'
     // #swagger.description = 'Delete user by Id'

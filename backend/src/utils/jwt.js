@@ -19,8 +19,6 @@ export async function verifyToken(token, expectedType) {
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        console.log("decoded token", decoded);
-
         if (decoded.type !== expectedType) {
             console.warn(`Token type mismatch: expected ${expectedType}, got ${decoded.type}`);
             return null;

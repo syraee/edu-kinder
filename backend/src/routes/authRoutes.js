@@ -58,15 +58,22 @@ router.post("/login/verify", async (req, res) => {
             "7d"
         );
 
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         return res.json({
             message: "Prihlásenie úspešné.",
-            accessToken,
             user: {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
-            },
+                role: user.role
+            }
         });
     } catch (err) {
         console.error(err);

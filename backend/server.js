@@ -4,6 +4,7 @@ const swaggerUi = require("swagger-ui-express");
 const routes = require("./src/routes/routes");
 const errorHandler = require("./src/middleware/errorHandler");
 const swaggerFile = require("./swagger-output.json");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use("/api", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
     res.redirect("/api-docs");
