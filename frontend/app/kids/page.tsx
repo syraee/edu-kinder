@@ -36,10 +36,14 @@ export default function StudentsPage() {
 
       <div className="govuk-width-container idsk-students" style={{ marginTop: "2rem" }}>
         <h1 className="govuk-heading-xl">Deti</h1>
-        <Link href="/kids-form" className="govuk-button" role="button" data-module="govuk-button">
-                Pridať dieťa
-            </Link>
-        {/* Tabs pre triedy */}
+        <div className="actions">
+          <Link href="/kids-form" className="govuk-button" role="button" data-module="govuk-button">
+            Pridať dieťa
+          </Link>
+          <Link href="/class-form" className="govuk-button" role="button" data-module="govuk-button">
+            Vytvoriť triedu
+          </Link>
+        </div>
         <div className="idsk-tabs">
           <ul className="idsk-tabs__list">
             {classes.map((cls) => (
@@ -55,8 +59,6 @@ export default function StudentsPage() {
             ))}
           </ul>
         </div>
-
-        {/* Zoznam deti */}
         <div className="students-grid">
           {filtered.map((child) => (
             <div key={child.id} className="student-card govuk-!-margin-top-4">

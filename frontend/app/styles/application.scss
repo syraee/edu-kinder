@@ -480,3 +480,19 @@ $govuk-assets-path: "/idsk-assets/";
                 }
                 .invite-remove:hover { background: #d8dde0; }
                 .invite-remove:focus { outline: 3px solid #d96e00; outline-offset: 0; }
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: nowrap;
+  margin-top: 0.75rem;
+}
+
+.actions .govuk-button {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  margin: 0 !important;
+}
