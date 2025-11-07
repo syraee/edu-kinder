@@ -2,7 +2,6 @@ const { verifyToken } = require("../utils/jwt");
 
 async function authenticate(req, res, next) {
     try {
-        console.log(req.cookies);
         const token = (req.cookies?.accessToken) || req.headers["authorization"]?.split(" ")[1];
 
         if (!token) {
@@ -15,7 +14,7 @@ async function authenticate(req, res, next) {
             return res.status(404).json({ error: "Používateľ neexistuje." });
         }
 
-        req.user = decoded;
+        req.user = user;
         next();
     } catch (err) {
         console.error("Auth error:", err);

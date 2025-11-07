@@ -10,7 +10,8 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const ORIGIN = 'http://localhost:3000';
-app.use(cors({ origin: ORIGIN, credentials: true })); // Express 5 stačí toto
+app.use(cookieParser());
+app.use(cors({ origin: ORIGIN, credentials: true }));
 
 // fallback, keby niečo prešlo mimo cors() – nech je 100% istota
 app.use((req, res, next) => {
@@ -26,7 +27,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use("/api", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-app.use(cookieParser());
 
 app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
 

@@ -26,10 +26,9 @@ async function verifyToken(token, expectedType) {
         }
 
         const user = await prisma.user.findUnique({
-            where: {
-                id: decoded.userId,
-            }
-        })
+            where: { id: decoded.userId },
+            include: { role: true },
+        });
 
         if (!user) {
             console.warn(`User not found with id ${decoded.userId}`);

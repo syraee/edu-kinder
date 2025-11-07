@@ -11,8 +11,10 @@ export default function InviteParentsPage() {
   const [error, setError] = useState<string>("");
   const [sending, setSending] = useState(false);
   const [banner, setBanner] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const API_BASE = "http://localhost:5000/api";
 
-  const normalize = (v: string) => v.trim().toLowerCase();
+
+    const normalize = (v: string) => v.trim().toLowerCase();
   const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
   const pendingCount = useMemo(() => emails.length, [emails]);
@@ -53,28 +55,47 @@ export default function InviteParentsPage() {
     setBanner(null);
   }
 
-  async function sendInvites() {
-    setError("");
-    setBanner(null);
+    async function sendInvites() {
+        setError("");
+        setBanner(null);
 
-    if (emails.length === 0) {
-      setError("Pridajte aspoň jeden e‑mail.");
-      return;
+        if (emails.length === 0) {
+            setError("Pridajte aspoň jeden e-mail.");
+            return;
+        }
+
+        try {
+            setSending(true);
+
+            const response = await fetch(API_BASE + "/auth/register/request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ emails }),
+                credentials: "include", // 👈 toto prenesie cookies
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Nepodarilo sa odoslať pozvánky.");
+            }
+
+            setBanner({
+                type: "success",
+                text: `Pozvánky spracované: ${data.summary.sent} odoslané, ${data.summary.skipped} preskočené, ${data.summary.failed} zlyhali.`,
+            });
+
+            console.log("Detaily:", data.details);
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error ? err.message :
+                    typeof err === "string" ? err :
+                        "Nepodarilo sa odoslať pozvánky.";
+            setBanner({ type: "error", text: message });
+        } finally {
+            setSending(false);
+        }
     }
-
-    try {
-      setSending(true);
-
-      setBanner({ type: "success", text: `Pozvánky boli odoslané (${emails.length}).` });
-
-      setEmails([]);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : typeof err === "string" ? err : "Nepodarilo sa odoslať pozvánky.";
-      setBanner({ type: "error", text: message });
-    } finally {
-      setSending(false);
-    }
-  }
 
   function handleAddSubmit(e: React.FormEvent) {
     e.preventDefault();

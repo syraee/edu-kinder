@@ -1,25 +1,60 @@
 const express = require("express");
 const prisma = require("../../prisma/client");
 const {generateToken, verifyToken} = require("../utils/jwt");
-const {verify, sign} = require("jsonwebtoken");
+const {verify} = require("jsonwebtoken");
 const {sendInvitationMail, sendLoginMail} = require("../utils/mailer.js");
+const authenticate = require("../middleware/authenticate");
+const authorize = require("../middleware/authorizeRole");
 const router = express.Router();
 
-router.post("/register/request", async (req, res) => {
-    try {
-        const { email} = req.body;
+router.post("/register/request", authenticate, authorize(["Admin"]), async (req, res) => {
+    const { emails } = req.body;
 
-        // const newUser = await prisma.user.create({ data: {email, active: false} });
-
-        const token = jwt.generateToken(9, email, "registration", "3d");
-
-        await sendInvitationMail(email, token);
-
-        res.status(200).json({ message: "Úspešne odoslany registracny mail" });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Nepodarilo sa zaregistrovať používateľa." });
+    if (!emails || !Array.isArray(emails) || emails.length === 0) {
+        return res.status(400).json({ error: "Zoznam emailov je prázdny alebo neplatný." });
     }
+
+    const results = {
+        sent: [],
+        skipped: [],
+        failed: []
+    };
+
+    for (const email of emails) {
+        try {
+            const existing = await prisma.user.findUnique({
+                where: { email }
+            });
+
+            if (existing) {
+                results.skipped.push({
+                    email,
+                    reason: "Už registrovaný používateľ"
+                });
+                continue;
+            }
+
+            // 2️⃣ Vygeneruj token a pošli e-mail
+            await sendInvitationMail(email);
+            results.sent.push(email);
+        } catch (err) {
+            console.error(`Nepodarilo sa odoslať pozvánku na ${email}:`, err);
+            results.failed.push({
+                email,
+                reason: "Chyba pri odosielaní"
+            });
+        }
+    }
+
+    return res.status(200).json({
+        message: "Spracovanie dokončené.",
+        summary: {
+            sent: results.sent.length,
+            skipped: results.skipped.length,
+            failed: results.failed.length
+        },
+        details: results
+    });
 });
 
 router.post("/login/request", async (req, res) => {
@@ -53,7 +88,7 @@ router.post("/login/verify", async (req, res) => {
         const accessToken = generateToken(
             user.id,
             user.email,
-            user.role,
+            user.role.name,
             "access",
             "7d"
         );
@@ -83,7 +118,7 @@ router.post("/login/verify", async (req, res) => {
     }
 });
 
-router.get("/verify", async (req, res) => {
+router.get("/register/verify", async (req, res) => {
     try {
         const { token } = req.query;
         const decoded = verify(token, process.env.JWT_SECRET);
