@@ -1,4 +1,4 @@
-export function authorizeRole(allowedRoles = []) {
+function authorizeRole(allowedRoles = []) {
     return (req, res, next) => {
         if (!req.user) {
             return res.status(401).json({ error: "Neautorizovaný prístup." });
@@ -11,3 +11,5 @@ export function authorizeRole(allowedRoles = []) {
         next();
     };
 }
+
+module.exports = authorizeRole;

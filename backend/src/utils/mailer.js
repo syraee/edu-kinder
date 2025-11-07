@@ -1,7 +1,7 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
+require('dotenv').config();
+const nodemailer = require('nodemailer');
 
-dotenv.config();
+
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function sendInvitationMail(to, token) {
+async function sendInvitationMail(to, token) {
     const invLink = `http://localhost:3000/registration?token=${token}`;
 
     const mailOptions = {
@@ -29,7 +29,7 @@ export async function sendInvitationMail(to, token) {
     await transporter.sendMail(mailOptions);
 }
 
-export async function sendLoginMail(to, link) {
+async function sendLoginMail(to, link) {
 
     const mailOptions = {
         from: `"EduKinder" <${process.env.SMTP_USER}>`,
@@ -45,3 +45,9 @@ export async function sendLoginMail(to, link) {
 
     await transporter.sendMail(mailOptions);
 }
+
+module.exports = {
+    transporter,
+    sendInvitationMail,
+    sendLoginMail,
+};

@@ -1,6 +1,6 @@
-import {verifyToken} from "../utils/jwt.js";
+const { verifyToken } = require("../utils/jwt");
 
-export async function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
     try {
         console.log(req.cookies);
         const token = (req.cookies?.accessToken) || req.headers["authorization"]?.split(" ")[1];
@@ -22,3 +22,5 @@ export async function authenticate(req, res, next) {
         return res.status(403).json({ error: "Neplatný alebo expirovaný token." });
     }
 }
+
+module.exports = authenticate;

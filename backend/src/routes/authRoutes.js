@@ -24,7 +24,7 @@ router.post("/register/request", async (req, res) => {
 
 router.post("/login/request", async (req, res) => {
     const { email} = req.body;
-
+    console.log(email);
     if (!email) return res.status(400).json({ error: "Email je povinný" });
 
     const loginUser = await prisma.user.findUnique({
@@ -35,9 +35,9 @@ router.post("/login/request", async (req, res) => {
 
     const token = generateToken( loginUser.id, email, loginUser.roleId, "login", "15m");
 
-    const link = `https://localhost:3000/login?token=${token}`;
+    const link = `http://localhost:5000/api/auth/login/verify?token=${token}`;
 
-    console.log(email);
+
 
     await sendLoginMail(email, link);
 
@@ -65,16 +65,18 @@ router.post("/login/verify", async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        return res.json({
-            message: "Prihlásenie úspešné.",
-            user: {
-                id: user.id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                role: user.role
-            }
-        });
+        // return res.json({
+        //     message: "Prihlásenie úspešné.",
+        //     user: {
+        //         id: user.id,
+        //         email: user.email,
+        //         firstName: user.firstName,
+        //         lastName: user.lastName,
+        //         role: user.role
+        //     }
+        // });
+
+        return res.redirect(303, "http://localhost:3000/");
     } catch (err) {
         console.error(err);
         return res.status(401).json({ error: "Neplatný alebo expirovaný token." });
@@ -93,6 +95,32 @@ router.get("/verify", async (req, res) => {
         res.json({ message: "Účet bol úspešne aktivovaný!" });
     } catch (err) {
         res.status(400).json({ error: "Neplatný alebo expirovaný token" });
+    }
+});
+
+router.get("/login/verify", async (req, res) => {
+    try {
+        const { token } = req.query;
+        if (!token) return res.status(400).send("Missing token");
+
+        // over login-token, ktorý si poslal do e-mailu
+        const { decoded, user } = await verifyToken(String(token), "login");
+
+        // vydaj access token (alebo aj refresh ak budeš používať)
+        const accessToken = generateToken(user.id, user.email, user.role, "access", "7d");
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            sameSite: "lax",                     // pre top-level prechod z e-mailu je OK
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        // presmeruj na FE domov (alebo kam chceš)
+        return res.redirect(303, "http://localhost:3000/");
+    } catch (err) {
+        console.error("login/verify failed:", err);
+        return res.status(401).send("Neplatný alebo expirovaný token.");
     }
 });
 

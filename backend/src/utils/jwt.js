@@ -1,7 +1,8 @@
-import jwt from "jsonwebtoken";
-import prisma from "../../prisma/client.js";
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const prisma = require("../../prisma/client");
 
-export function generateToken(userId, email, role, type, expiresIn) {
+function generateToken(userId, email, role, type, expiresIn) {
     const payload = {
         userId,
         email,
@@ -15,7 +16,7 @@ export function generateToken(userId, email, role, type, expiresIn) {
     });
 }
 
-export async function verifyToken(token, expectedType) {
+async function verifyToken(token, expectedType) {
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -41,3 +42,5 @@ export async function verifyToken(token, expectedType) {
         return null;
     }
 }
+
+module.exports = { generateToken, verifyToken };

@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../../prisma/client");
-const {authenticate} = require("../middleware/authenticate");
-const {authorizeRole} = require("../middleware/authorizeRole");
+const authenticate = require("../middleware/authenticate");
+const authorizeRole = require("../middleware/authorizeRole");
 
 // GET /api/user
 router.get("/", async (req, res, next) => {
