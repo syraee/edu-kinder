@@ -114,8 +114,6 @@ router.post("/login/request", async (req, res) => {
 
     const link = `http://localhost:5000/api/auth/login/verify?token=${token}`;
 
-
-
     await sendLoginMail(email, link);
 
     return res.json({ message: "Na váš e-mail bol odoslaný prihlasovací odkaz." });
