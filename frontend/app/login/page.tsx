@@ -6,6 +6,8 @@ export default function PrihlaseniePage() {
     const [state, setState] = useState<State>("default");
     const [email, setEmail] = useState("");
     const [emailErr, setEmailErr] = useState<string | null>(null);
+    const API_BASE = "http://localhost:5000/api";
+    const [loading, setLoading] = useState(false);
     const errSummaryRef = useRef<HTMLDivElement>(null);
 
     const hasError = !!emailErr;
@@ -17,7 +19,7 @@ export default function PrihlaseniePage() {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     }
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         const trimmed = email.trim();
 
@@ -34,8 +36,30 @@ export default function PrihlaseniePage() {
             return;
         }
 
-        setEmailErr(null);
-        setState("sent");
+        try {
+            setLoading(true);
+            const res = await fetch(`${API_BASE}/auth/login/request`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: trimmed }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || data.message || "Chyba pri odoslaní.");
+            setEmailErr(null);
+            setState("sent"); // zobraz tvoj „sent“ panel
+        } catch (err:unknown) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : typeof err === "string"
+                        ? err
+                        : "Neznáma chyba";
+
+            setEmailErr(message);
+            setState("error");
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
