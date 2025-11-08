@@ -34,8 +34,17 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
                 continue;
             }
 
-            // 2️⃣ Vygeneruj token a pošli e-mail
-            await sendInvitationMail(email);
+            const newUser = await prisma.user.create({
+                data: {
+                    email,
+                    roleId: 3,
+                    active: false,
+                }
+            });
+
+            const token = generateToken(newUser.id, email, newUser.roleId, "registration", "3d" );
+
+            await sendInvitationMail(email, token);
             results.sent.push(email);
         } catch (err) {
             console.error(`Nepodarilo sa odoslať pozvánku na ${email}:`, err);
@@ -71,8 +80,6 @@ router.post("/login/request", async (req, res) => {
     const token = generateToken( loginUser.id, email, loginUser.roleId, "login", "15m");
 
     const link = `http://localhost:5000/api/auth/login/verify?token=${token}`;
-
-
 
     await sendLoginMail(email, link);
 
