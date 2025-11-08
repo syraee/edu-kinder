@@ -10,7 +10,6 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const ORIGIN = 'http://localhost:3000';
-app.use(cookieParser());
 app.use(cors({ origin: ORIGIN, credentials: true }));
 
 // fallback, keby niečo prešlo mimo cors() – nech je 100% istota
@@ -25,7 +24,9 @@ app.use((req, res, next) => {
 
 //Middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api", routes);
+app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
@@ -37,7 +38,6 @@ app.get("/", (req, res) => {
 
 //Error handler
 app.use(errorHandler);
-app.use('/api/auth', require('./src/routes/authRoutes'));
 // Start server
 app.listen(PORT, () => {
     console.log(`\nServer is running!\n`);
