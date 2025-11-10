@@ -1,17 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Getting Started
+
+# Frontend (Next.js)
 
 First, run the development server:
 
 ```bash
-npm run dev
+  npm run dev
 # or
-yarn dev
+  yarn dev
 # or
-pnpm dev
+  pnpm dev
 # or
-bun dev
+  bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -20,7 +22,99 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+
+# Backend (Node.js + Express)
+
+1. Navigate to the backend folder:
+    ```bash
+      cd backend
+    ```
+2. Install dependencies: 
+
+    ```bash
+      npm install
+    ```
+
+3. Start the server in development mode
+   ```bash
+      npm run dev
+   ```
+
+By default, the backend runs on http://localhost:5000/api 
+.
+You should see:
+
+Server running on port 5000
+
+(Optional) - For writing API docs install swagger and swagger-autogen: 
+```bash
+  cd backend
+```
+```bash
+  npm install swagger-ui-express
+``` 
+
+```bash
+  npm install swagger-autogen
+```
+If you want to create new docs for endpoints type:
+```bash
+  node swagger.js
+```
+
+## Database
+
+This project uses PostgreSQL with Prisma ORM
+for database management. Follow these steps to set it up locally:
+
+1. Prerequisites 
+
+   1. Docker 
+   2. Node.js and npm
+   3. Install Prisma client
+      ```bash
+        npm install prisma @prisma/client
+      ```
+   4. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
+
+2. Start PostgreSQL
+    In the backend folder, there is a docker-compose.yml file. Run:
+
+    ```bash
+      docker-compose up -d
+    ```
+    
+    This will start PostgreSQL with the following credentials:
+    
+    Host: localhost
+    
+    Port: 5432
+    
+    Check that the container is running:
+    
+    ```bash
+      docker ps
+    ```
+
+3. Prisma setup
+
+    Generate Prisma client and create database tables:
+
+    ```bash
+      npx prisma generate
+      npx prisma migrate dev --name init
+    ```
+
+4. Seed test data
+
+    Populate the database with example users:
+    
+    ```bash
+      npm run seed
+    ```
+   
+
+# Learn More
 
 To learn more about Next.js, take a look at the following resources:
 

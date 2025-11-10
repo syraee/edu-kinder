@@ -1,0 +1,14 @@
+__turbopack_load_page_chunks__("/_error", [
+  "static/chunks/c2704_next_dist_compiled_next-devtools_index_208e508e.js",
+  "static/chunks/c2704_next_dist_compiled_537c951f._.js",
+  "static/chunks/c2704_next_dist_shared_lib_85fde672._.js",
+  "static/chunks/c2704_next_dist_client_3cd49888._.js",
+  "static/chunks/c2704_next_dist_72eeefca._.js",
+  "static/chunks/c2704_next_error_05b48698.js",
+  "static/chunks/[next]_entry_page-loader_ts_6cb33498._.js",
+  "static/chunks/c2704_react-dom_3d6893c4._.js",
+  "static/chunks/c2704_948ae112._.js",
+  "static/chunks/[root-of-the-server]__d2f9d1a8._.js",
+  "static/chunks/edu-kinder_pages__error_2da965e7._.js",
+  "static/chunks/turbopack-edu-kinder_pages__error_95d64e59._.js"
+])
