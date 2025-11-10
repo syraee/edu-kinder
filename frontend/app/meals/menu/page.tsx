@@ -1,4 +1,4 @@
-// app/strava/jedalny-listok/page.tsx
+// app/meals/menu/page.tsx
 import Header from "@/app/components/Header";
 import MenuDisplay from "@/app/components/MenuDisplay";
 import { cookies } from "next/headers";
@@ -21,7 +21,7 @@ async function getUserSSR() {
   }
 }
 
-export default async function StravaJedalnyListokPage() {
+export default async function MealsMenuPage() {
   const user = await getUserSSR();
   const isAuthed = !!user;
 
@@ -84,7 +84,10 @@ export default async function StravaJedalnyListokPage() {
 
             <main className="idsk-docs__content">
               <h1 className="govuk-heading-xl">Jedálny lístok</h1>
-              <MenuDisplay pdfUrl="https://www.upjs.sk/app/uploads/sites/26/2025/10/20-24.10.2025.pdf" />
+              <MenuDisplay
+                autoFetch={true}
+                sourceUrl="https://www.upjs.sk/materska-skola-upejesko/stravovanie/"
+              />
             </main>
           </div>
         </div>
