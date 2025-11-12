@@ -24,6 +24,7 @@ model User {
   phone     String?
   createdAt DateTime  @default(now())
 
+  teachingClasses GroupClass[]
   children  ChildGuardian[]
   loginTokens LoginToken[]
   sessions  Session[]
@@ -43,6 +44,7 @@ model Child {
   groupId   Int?
   birthday  DateTime?
   createdAt DateTime   @default(now())
+  group     GroupClass? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   guardians ChildGuardian[]
 }
@@ -54,6 +56,18 @@ model ChildGuardian {
   relationship String
   child      Child @relation(fields: [childId], references: [id])
   childId    Int
+}
+
+model GroupClass {
+  id           Int      @id @default(autoincrement())
+  name         String
+  class        String
+  classYear    DateTime
+  classTeacherId  Int?
+  classTeacher    User?    @relation(fields: [classTeacherId], references: [id], onDelete: SetNull)
+  roomName        String
+
+  children     Child[]
 }
 
 model LoginToken {

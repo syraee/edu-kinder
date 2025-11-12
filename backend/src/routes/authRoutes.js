@@ -27,7 +27,12 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
                 where: { email }
             });
 
-            if (existing) {
+            if (!existing) {
+                results.skipped.push({ email, reason: "Používateľ neexistuje" });
+                continue;
+            }
+
+            if (existing.active) {
                 results.skipped.push({
                     email,
                     reason: "Už registrovaný používateľ"
@@ -35,18 +40,19 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
                 continue;
             }
 
-            const newUser = await prisma.user.create({
-                data: {
-                    email,
-                    roleId: 3,
-                    active: false,
-                }
-            });
+            // const newUser = await prisma.user.create({
+            //     data: {
+            //         email,
+            //         roleId: 3,
+            //         active: false,
+            //     }
+            // });
 
-            const token = generateToken(newUser.id, email, newUser.roleId, "registration", "3d" );
+            const token = generateToken(existing.id, email, existing.roleId, "registration", "3d" );
 
             await sendInvitationMail(email, token);
             results.sent.push(email);
+
         } catch (err) {
             console.error(`Nepodarilo sa odoslať pozvánku na ${email}:`, err);
             results.failed.push({
@@ -65,6 +71,100 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
         },
         details: results
     });
+});
+
+router.post('/register/prefill', async (req, res) => {
+    try {
+        const { token } = req.body || {};
+        if (!token) return res.status(400).json({ error: 'Chýba token.' });
+
+        const result = await verifyToken(token, 'registration');
+        if (!result) return res.status(401).json({ error: 'Neplatný alebo expirovaný token.' });
+
+        const { user } = result;
+
+        if (user.active) {
+            return res
+                .status(409)
+                .json({ error: 'Registrácia je už dokončená. Môžete sa prihlásiť.', redirectUrl: '/login' });
+        }
+
+        const links = await prisma.childGuardian.findMany({
+            where: { userId: user.id },
+            include: { child: true },
+            orderBy: { id: 'asc' },
+        });
+
+        const children = links.map((l) => ({
+            id:        l.child.id,
+            firstName: l.child.firstName || '',
+            lastName:  l.child.lastName  || '',
+            birthDate: l.child.birthDate ? l.child.birthDate.toISOString().slice(0, 10) : '',
+
+        }));
+
+        return res.json({
+            parent: {
+                firstName: user.firstName || '',
+                lastName:  user.lastName  || '',
+                email:     user.email     || '',
+                phone:     user.phone     || '',
+            },
+            children,
+        });
+    } catch (err) {
+        console.error('prefill error:', err);
+        return res.status(500).json({ error: 'Server zlyhal pri načítaní údajov.' });
+    }
+});
+
+router.post('/register/complete', async (req, res) => {
+    try {
+        const { token, parent, childIds } = req.body || {};
+        if (!token)  return res.status(400).json({ error: 'Chýba token.' });
+        if (!parent) return res.status(400).json({ error: 'Chýbajú údaje rodiča.' });
+
+        const result = await verifyToken(token, 'registration');
+        if (!result) return res.status(401).json({ error: 'Neplatný alebo expirovaný token.' });
+
+        const { user } = result;
+
+
+        if (Array.isArray(childIds) && childIds.length > 0) {
+            const ids = childIds.map(Number);
+            const guardians = await prisma.childGuardian.findMany({
+                where: { userId: user.id, childId: { in: ids } },
+                select: { childId: true },
+            });
+            const owned = new Set(guardians.map(g => g.childId));
+            const allMatch = ids.every(id => owned.has(id));
+            if (!allMatch) return res.status(403).json({ error: 'Zoznam detí nezodpovedá priradeným deťom.' });
+        }
+
+
+        const firstName = String(parent.firstName || '').trim();
+        const lastName  = String(parent.lastName  || '').trim();
+        const email     = String(parent.email     || '').trim().toLowerCase();
+        const phone     = String(parent.phone     || '').trim();
+
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data:  {
+                firstName,
+                lastName,
+                email,
+                phone,
+                active: true,
+            },
+        });
+
+        return res.json({ message: 'Registrácia dokončená a účet aktivovaný.' });
+
+    } catch (err) {
+        console.error('registration/complete error:', err);
+        return res.status(500).json({ error: 'Server zlyhal pri ukladaní registrácie.' });
+    }
 });
 
 router.get("/me", authenticate, (req, res) => {
@@ -178,20 +278,17 @@ router.get("/login/verify", async (req, res) => {
         const { token } = req.query;
         if (!token) return res.status(400).send("Missing token");
 
-        // over login-token, ktorý si poslal do e-mailu
         const { decoded, user } = await verifyToken(String(token), "login");
 
-        // vydaj access token (alebo aj refresh ak budeš používať)
         const accessToken = generateToken(user.id, user.email, user.role, "access", "7d");
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            sameSite: "lax",                     // pre top-level prechod z e-mailu je OK
+            sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        // presmeruj na FE domov (alebo kam chceš)
         return res.redirect(303, "http://localhost:3000/");
     } catch (err) {
         console.error("login/verify failed:", err);

@@ -1,21 +1,19 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import {useEffect, useState} from "react";
+import { useSearchParams } from "next/navigation";
 
 type Child = { id: string; firstName: string; lastName: string; birthDate: string };
 type FieldError = string | null;
 
-const AGE_MIN = 1;
-const AGE_MAX = 8;
-
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
 function isEmail(v: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
-// Slovenské čísla: +4219XXXXXXXX alebo 09XXXXXXXX
 function normalizePhone(raw: string) {
     const v = raw.replace(/[\s-]+/g, "");
-    if (/^09\d{8}$/.test(v)) return "+421" + v.slice(1); // 09.. -> +4219..
+    if (/^09\d{8}$/.test(v)) return "+421" + v.slice(1);
     return v;
 }
 function isSkMobile(v: string) {
@@ -23,116 +21,138 @@ function isSkMobile(v: string) {
     return /^\+4219\d{8}$/.test(n);
 }
 
-function yearsBetween(d: Date, ref = new Date()) {
-    const diff = ref.getTime() - d.getTime();
-    return diff / (365.2425 * 24 * 3600 * 1000);
-}
 
 export default function Home() {
+    const search = useSearchParams();
+    const token = search.get("token") ?? "";
     // ====== STAV ======
     const [parent, setParent] = useState({ firstName: "", lastName: "", email: "", phone: "" });
-    const [children, setChildren] = useState<Child[]>([
-        { id: crypto.randomUUID(), firstName: "", lastName: "", birthDate: "" },
-    ]);
+    const [children, setChildren] = useState<Child[]>([]);
     const [submitting, setSubmitting] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [prefillError, setPrefillError] = useState<string | null>(null);
 
     // ERRORS
     const [parentErr, setParentErr] = useState<Record<keyof typeof parent, FieldError>>({
         firstName: null, lastName: null, email: null, phone: null,
     });
-    const [childErr, setChildErr] = useState<Record<string, { firstName: FieldError; lastName: FieldError; birthDate: FieldError }>>({});
+
+    interface RawChild {
+        id: string | number;
+        firstName?: string;
+        lastName?: string;
+        birthDate?: string;
+    }
+
+    useEffect(() => {
+        (async () => {
+            try {
+                if (!token) {
+                    setPrefillError("Chýba registračný token v adrese URL.");
+                    return;
+                }
+                const res = await fetch(`${API_BASE}/auth/register/prefill`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token }),
+                    credentials: "include",
+                });
+
+                if (res.status === 409) {
+                    const data = await res.json().catch(() => ({}));
+                    window.location.href = "/login";
+                    return;
+                }
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || data.message || "Nepodarilo sa načítať údaje.");
+
+                setParent({
+                    firstName: (data.parent?.firstName ?? "").trim(),
+                    lastName : (data.parent?.lastName  ?? "").trim(),
+                    email    : (data.parent?.email     ?? "").trim().toLowerCase(),
+                    phone    : normalizePhone(data.parent?.phone ?? ""),
+                });
+
+                const kids: Child[] = (Array.isArray(data.children) ? data.children : []).map((c: RawChild) => ({
+                    id: Number(c.id),
+                    firstName: (c.firstName ?? "").trim(),
+                    lastName : (c.lastName  ?? "").trim(),
+                    birthDate: (c.birthDate ?? "").slice(0, 10),
+                }));
+                setChildren(kids);
+            } catch (e) {
+                setPrefillError("Nepodarilo sa načítať údaje.");
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [token]);
 
     // ====== HANDLERY ======
     function updateParent<K extends keyof typeof parent>(key: K, value: string) {
         setParent((p) => ({ ...p, [key]: value }));
         setParentErr((e) => ({ ...e, [key]: null }));
     }
-    function updateChild(id: string, key: keyof Child, value: string) {
-        setChildren((arr) => arr.map((c) => (c.id === id ? { ...c, [key]: value } : c)));
-        setChildErr((e) => ({ ...e, [id]: { ...(e[id] || { firstName: null, lastName: null, birthDate: null }), [key]: null } }));
-    }
-    function addChild() {
-        setChildren((arr) => [...arr, { id: crypto.randomUUID(), firstName: "", lastName: "", birthDate: "" }]);
-    }
-    function removeChild(id: string) {
-        setChildren((arr) => (arr.length <= 1 ? arr : arr.filter((c) => c.id !== id)));
-        setChildErr((e) => {
-            const copy = { ...e }; delete copy[id]; return copy;
-        });
-    }
 
-    // TRIM na blur
+
     function trimParent<K extends keyof typeof parent>(key: K) {
         setParent((p) => ({ ...p, [key]: p[key].trim() }));
     }
-    function trimChild(id: string, key: keyof Child) {
-        setChildren((arr) => arr.map((c) => (c.id === id ? { ...c, [key]: String(c[key]).trim() } : c)));
-    }
 
-    // VALIDÁCIA
+
     function validate(): boolean {
         const pe: typeof parentErr = { firstName: null, lastName: null, email: null, phone: null };
-        const ce: typeof childErr = {};
 
-        // rodič
+
         const fn = parent.firstName.trim();
         const ln = parent.lastName.trim();
         const em = parent.email.trim().toLowerCase();
         const ph = parent.phone.trim();
 
-        if (!fn) pe.firstName = "Zadajte meno.";
-        if (!ln) pe.lastName = "Zadajte priezvisko.";
-        if (!em || !isEmail(em)) pe.email = "Zadajte platný e-mail.";
-        if (!ph || !isSkMobile(ph)) pe.phone = "Zadajte slovenské mobilné číslo (+4219...).";
+        if (!fn) pe.firstName = "Meno";
+        if (!ln) pe.lastName = "Priezvisko";
+        if (!em || !isEmail(em)) pe.email = "Email";
+        if (!ph || !isSkMobile(ph)) pe.phone = "Telefónne číslo";
 
-        // deti
-        for (const c of children) {
-            const id = c.id;
-            const rec = { firstName: null as FieldError, lastName: null as FieldError, birthDate: null as FieldError };
-            const cfn = c.firstName.trim();
-            const cln = c.lastName.trim();
-            const bdStr = c.birthDate.trim();
-
-            if (!cfn) rec.firstName = "Zadajte meno dieťaťa.";
-            if (!cln) rec.lastName = "Zadajte priezvisko dieťaťa.";
-
-            if (!bdStr) {
-                rec.birthDate = "Zadajte dátum narodenia.";
-            } else {
-                const bd = new Date(bdStr);
-                if (Number.isNaN(bd.getTime())) {
-                    rec.birthDate = "Neplatný dátum.";
-                } else {
-                    const now = new Date();
-                    if (bd > now) rec.birthDate = "Dátum nemôže byť v budúcnosti.";
-                    const age = yearsBetween(bd, now);
-                    if (age < AGE_MIN || age > AGE_MAX) {
-                        rec.birthDate = `Vek dieťaťa mimo rozsah ${AGE_MIN}–${AGE_MAX} rokov.`;
-                    }
-                }
-            }
-            ce[id] = rec;
-        }
 
         setParentErr(pe);
-        setChildErr(ce);
 
-        // ak existuje aspoň 1 chyba
         const parentHas = Object.values(pe).some(Boolean);
-        const childHas = Object.values(ce).some((r) => r.firstName || r.lastName || r.birthDate);
-        return !(parentHas || childHas);
+        return !(parentHas);
     }
 
     async function handleFinish(e: React.FormEvent) {
         e.preventDefault();
 
         setParent((p) => ({ ...p, firstName: p.firstName.trim(), lastName: p.lastName.trim(), email: p.email.trim(), phone: p.phone.trim() }));
-        setChildren((arr) => arr.map((c) => ({ ...c, firstName: c.firstName.trim(), lastName: c.lastName.trim(), birthDate: c.birthDate.trim() })));
 
         if (!validate()) return;
 
         try {
             setSubmitting(true);
+            const res = await fetch(`${API_BASE}/auth/register/complete`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    token,
+                    parent: {
+                        firstName: parent.firstName.trim(),
+                        lastName: parent.lastName.trim(),
+                        email: parent.email.trim().toLowerCase(),
+                        phone: normalizePhone(parent.phone),
+                    },
+
+                    childIds: children.map(c => c.id),
+                }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || data.message || "Uloženie zlyhalo.");
+
+
+            window.location.href = "/login";
+
 
 
         } finally {
@@ -234,16 +254,13 @@ export default function Home() {
 
                                 <div className={`govuk-form-group ${parentErr.email ? "govuk-form-group--error" : ""}`}>
                                     <label className="govuk-label" htmlFor="parent-email">E-mail</label>
-                                    {parentErr.email && <p className="govuk-error-message"><span className="govuk-visually-hidden">Chyba:</span> {parentErr.email}</p>}
                                     <input
-                                        className={`govuk-input govuk-input--width-20 ${parentErr.email ? "govuk-input--error" : ""}`}
+                                        className={`govuk-input govuk-input--width-20`}
                                         id="parent-email"
                                         type="email"
                                         autoComplete="email"
                                         value={parent.email}
-                                        onChange={(e) => updateParent("email", e.target.value)}
-                                        onBlur={() => trimParent("email")}
-                                        required
+                                        readOnly
                                     />
                                 </div>
 
@@ -274,69 +291,37 @@ export default function Home() {
 
                                 {children.map((c, idx) => {
                                     const base = `child-${c.id}`;
-                                    const errs = childErr[c.id] || { firstName: null, lastName: null, birthDate: null };
                                     return (
                                         <div key={c.id} className="govuk-inset-text">
                                             <h3 className="govuk-heading-m govuk-!-margin-bottom-2">Dieťa {idx + 1}</h3>
 
-                                            <div className={`govuk-form-group ${errs.firstName ? "govuk-form-group--error" : ""}`}>
+                                            <div className={`govuk-form-group`}>
                                                 <label className="govuk-label" htmlFor={`${base}-firstName`}>Meno</label>
-                                                {errs.firstName && <p className="govuk-error-message"><span className="govuk-visually-hidden">Chyba:</span> {errs.firstName}</p>}
                                                 <input
-                                                    className={`govuk-input govuk-input--width-20 ${errs.firstName ? "govuk-input--error" : ""}`}
+                                                    className={`govuk-input govuk-input--width-20}`}
                                                     id={`${base}-firstName`}
-                                                    type="text"
+
                                                     value={c.firstName}
-                                                    onChange={(e) => updateChild(c.id, "firstName", e.target.value)}
-                                                    onBlur={() => trimChild(c.id, "firstName")}
-                                                    required
+                                                    readOnly
+
                                                 />
                                             </div>
 
-                                            <div className={`govuk-form-group ${errs.lastName ? "govuk-form-group--error" : ""}`}>
+                                            <div className={`govuk-form-group`}>
                                                 <label className="govuk-label" htmlFor={`${base}-lastName`}>Priezvisko</label>
-                                                {errs.lastName && <p className="govuk-error-message"><span className="govuk-visually-hidden">Chyba:</span> {errs.lastName}</p>}
                                                 <input
-                                                    className={`govuk-input govuk-input--width-20 ${errs.lastName ? "govuk-input--error" : ""}`}
+                                                    className={`govuk-input govuk-input--width-20`}
                                                     id={`${base}-lastName`}
-                                                    type="text"
                                                     value={c.lastName}
-                                                    onChange={(e) => updateChild(c.id, "lastName", e.target.value)}
-                                                    onBlur={() => trimChild(c.id, "lastName")}
-                                                    required
+                                                    readOnly
                                                 />
                                             </div>
 
-                                            <div className={`govuk-form-group ${errs.birthDate ? "govuk-form-group--error" : ""}`}>
-                                                <label className="govuk-label" htmlFor={`${base}-birthDate`}>Dátum narodenia</label>
-                                                {errs.birthDate && <p className="govuk-error-message"><span className="govuk-visually-hidden">Chyba:</span> {errs.birthDate}</p>}
-                                                <input
-                                                    className={`govuk-input govuk-!-width-two-thirds ${errs.birthDate ? "govuk-input--error" : ""}`}
-                                                    id={`${base}-birthDate`}
-                                                    type="date"
-                                                    value={c.birthDate}
-                                                    onChange={(e) => updateChild(c.id, "birthDate", e.target.value)}
-                                                    onBlur={() => trimChild(c.id, "birthDate")}
-                                                    required
-                                                />
-                                            </div>
 
-                                            {children.length > 1 && (
-                                                <div className="govuk-button-group">
-                                                    <button type="button" className="govuk-button govuk-button--secondary" onClick={() => removeChild(c.id)}>
-                                                        Odstrániť toto dieťa
-                                                    </button>
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })}
 
-                                <div className="govuk-button-group">
-                                    <button type="button" className="govuk-button govuk-button--secondary" onClick={addChild} data-module="govuk-button">
-                                        + Pridať dieťa
-                                    </button>
-                                </div>
                             </fieldset>
 
                             <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
