@@ -1,28 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/app/components/Header";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+
+interface Group {
+  id: number;
+  name: string;
+  class: string;
+}
+
 export default function ChildFormPage() {
+  const [groups, setGroups] = useState<Group[]>([]);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     birthDate: "",
-    class: "",
-    group: "",
-    address: "",
-    note: "",
+    groupId: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    async function fetchGroups() {
+      try {
+        const res = await fetch(`${API_BASE}/group`, { credentials: "include" });
+        const data = await res.json();
+        if (data?.success) setGroups(data.data);
+      } catch (err) {
+        console.error("Chyba pri načítaní tried:", err);
+      }
+    }
+    fetchGroups();
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Odoslané údaje:", form);
-    alert("Údaje o dieťati boli uložené ✅");
+
+    if (!form.firstName || !form.lastName || !form.birthDate || !form.groupId) {
+      alert("Vyplňte všetky povinné údaje.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/child`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          birthDate: form.birthDate,
+          groupId: parseInt(form.groupId, 10),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alert("Dieťa bolo úspešne uložené ✅");
+        setForm({ firstName: "", lastName: "", birthDate: "", groupId: "" });
+      } else {
+        alert("Chyba: " + (data.error || "Nepodarilo sa uložiť dieťa."));
+      }
+    } catch (err) {
+      console.error("Chyba pri ukladaní dieťaťa:", err);
+      alert("Nepodarilo sa pripojiť k serveru.");
+    }
   };
 
   return (
@@ -35,9 +84,7 @@ export default function ChildFormPage() {
         <form className="govuk-form-group" onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="firstName">
-                Meno dieťaťa
-              </label>
+              <label className="govuk-label" htmlFor="firstName">Meno dieťaťa</label>
               <input
                 id="firstName"
                 name="firstName"
@@ -50,9 +97,7 @@ export default function ChildFormPage() {
             </div>
 
             <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="lastName">
-                Priezvisko dieťaťa
-              </label>
+              <label className="govuk-label" htmlFor="lastName">Priezvisko dieťaťa</label>
               <input
                 id="lastName"
                 name="lastName"
@@ -65,9 +110,7 @@ export default function ChildFormPage() {
             </div>
 
             <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="birthDate">
-                Dátum narodenia
-              </label>
+              <label className="govuk-label" htmlFor="birthDate">Dátum narodenia</label>
               <input
                 id="birthDate"
                 name="birthDate"
@@ -75,73 +118,27 @@ export default function ChildFormPage() {
                 className="govuk-input"
                 value={form.birthDate}
                 onChange={handleChange}
+                required
               />
             </div>
 
             <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="class">
-                Trieda
-              </label>
+              <label className="govuk-label" htmlFor="groupId">Trieda</label>
               <select
-                id="class"
-                name="class"
+                id="groupId"
+                name="groupId"
                 className="govuk-select"
-                value={form.class}
+                value={form.groupId}
                 onChange={handleChange}
+                required
               >
                 <option value="">-- Vyber triedu --</option>
-                <option value="Včielky">Včielky</option>
-                <option value="Lienky">Lienky</option>
-                <option value="Motýliky">Motýliky</option>
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name} ({g.class})
+                  </option>
+                ))}
               </select>
-            </div>
-
-            <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="group">
-                Skupina
-              </label>
-              <select
-                id="group"
-                name="group"
-                className="govuk-select"
-                value={form.group}
-                onChange={handleChange}
-              >
-                <option value="">-- Vyber skupinu --</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-              </select>
-            </div>
-
-            <div className="govuk-form-group govuk-!-width-full">
-              <label className="govuk-label" htmlFor="address">
-                Adresa
-              </label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                className="govuk-input"
-                value={form.address}
-                onChange={handleChange}
-              />
-            </div>
-
-            <hr className="govuk-section-break govuk-section-break--visible" />
-
-            <div className="govuk-form-group govuk-!-width-full">
-              <label className="govuk-label" htmlFor="note">
-                Poznámka
-              </label>
-              <textarea
-                id="note"
-                name="note"
-                className="govuk-textarea"
-                rows={4}
-                value={form.note}
-                onChange={handleChange}
-              />
             </div>
           </div>
 

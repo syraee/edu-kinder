@@ -15,7 +15,7 @@ export default function Home() {
 
           <div className="idsk-docs__row">
             <main className="idsk-docs__content">
-              <h1 className="govuk-heading-xl">Hlavná obrazovka
+              <h1 className="govuk-heading-xl">Vitajte na webe EduKinder!
               </h1>
             </main>
           </div>

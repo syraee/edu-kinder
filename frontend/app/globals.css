@@ -1,17 +1,14 @@
-/* Zabezpečí, že appka ignoruje dark mode z OS */
 :root {
   color-scheme: light only;
   background-color: #ffffff !important;
   color: #000000 !important;
 }
 
-/* Vynútime svetlé pozadie pre všetky prvky */
 html, body {
   background: #ffffff !important;
   color: #000000 !important;
 }
 
-/* Ak browser aplikuje forced dark theme */
 @media (prefers-color-scheme: dark) {
   html, body {
     background: #ffffff !important;
@@ -293,7 +290,7 @@ a {
         }
           /*button pridat rodica*/
         .govuk-button[name="focus"],
-          a.govuk-button {
+          a.govuk-button .add-parent {
             display: block;
             margin-left: auto; 
             margin-bottom: 1rem; 
