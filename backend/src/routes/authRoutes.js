@@ -194,6 +194,7 @@ router.post("/logout", (req, res) => {
     secure: false,
     httpOnly: true,
   });
+  res.clearCookie("refreshToken");
   return res.json({ ok: true });
 });
 
@@ -280,13 +281,22 @@ router.get("/login/verify", async (req, res) => {
 
         const { decoded, user } = await verifyToken(String(token), "login");
 
-        const accessToken = generateToken(user.id, user.email, user.role, "access", "7d");
+        const accessToken = generateToken(user.id, user.email, user.role, "access", "2h");
+        const refreshToken = generateToken(user.id, user.email, user.role, "refresh", "7d");
+
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 60 * 60 * 1000,
         });
 
         return res.redirect(303, "http://localhost:3000/");
@@ -296,4 +306,36 @@ router.get("/login/verify", async (req, res) => {
     }
 });
 
+router.post("/refresh", async (req, res) => {
+    try {
+        const { refreshToken } = req.cookies;
+        if (!refreshToken) {
+            return res.status(401).json({ error: "Missing refresh token" });
+        }
+
+        const { decoded, user } = await verifyToken(refreshToken, "refresh");
+
+        const newAccessToken = generateToken(
+            user.id,
+            user.email,
+            user.role,
+            "access",
+            "2h"
+        );
+
+        res.cookie("accessToken", newAccessToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 2 * 60 * 60 * 1000,
+        });
+
+        return res.json({ success: true });
+    } catch (err) {
+        console.error("refresh failed:", err);
+        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken");
+        return res.status(401).json({ error: "Invalid refresh token" });
+    }
+});
 module.exports = router;

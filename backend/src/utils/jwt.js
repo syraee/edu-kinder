@@ -10,15 +10,29 @@ function generateToken(userId, email, role, type, expiresIn) {
         role
     };
 
-    return jwt.sign(payload, process.env.JWT_SECRET, {
+    const secret = type === "access" ? process.env.JWT_ACCESS_SECRET : type === "refresh" ? process.env.JWT_REFRESH_SECRET : process.env.JWT_LOGIN_SECRET;
+
+    return jwt.sign(payload, secret, {
         expiresIn: expiresIn,
         jwtid: crypto.randomUUID(),
     });
 }
 
 async function verifyToken(token, expectedType) {
-    try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+
+        const secret =
+            expectedType === "access"
+                ? process.env.JWT_ACCESS_SECRET
+                : expectedType === "refresh"
+                    ? process.env.JWT_REFRESH_SECRET
+                    : process.env.JWT_LOGIN_SECRET;
+
+        if (!secret) {
+            throw new Error(`Missing JWT secret for type: ${expectedType}`);
+        }
+
+        const decoded = jwt.verify(token, secret);
 
         if (decoded.type !== expectedType) {
             console.warn(`Token type mismatch: expected ${expectedType}, got ${decoded.type}`);
@@ -32,14 +46,10 @@ async function verifyToken(token, expectedType) {
 
         if (!user) {
             console.warn(`User not found with id ${decoded.userId}`);
-            return null;
         }
 
         return {decoded, user};
-    }catch (err){
-        console.error('Token verification failed', err.message);
-        return null;
-    }
+
 }
 
 module.exports = { generateToken, verifyToken };

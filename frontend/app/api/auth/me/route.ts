@@ -13,10 +13,16 @@ export async function GET() {
       credentials: "include",
       cache: "no-store",
     });
-    if (!r.ok) return NextResponse.json({ user: null }, { status: r.status });
     const data = await r.json();
-    return NextResponse.json(data, { status: 200 });
-  } catch {
+    const response = NextResponse.json(data, { status: r.status });
+
+    const setCookie = r.headers.get("set-cookie");
+    if (setCookie) {
+        response.headers.set("set-cookie", setCookie);
+    }
+
+    return response;
+  } catch (e) {
     return NextResponse.json({ user: null }, { status: 200 });
   }
 }
