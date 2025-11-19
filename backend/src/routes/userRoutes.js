@@ -102,27 +102,46 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// POST /api/user
+// POST /api/user – vytvorenie nového používateľa (rodiča, učiteľa, admina)
 router.post("/", async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { firstName, lastName, email, phone, roleId, active } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
+    // základná validácia
+    if (!email || !firstName || !lastName) {
+      return res.status(400).json({ error: "Chýba meno, priezvisko alebo email." });
+    }
+
+    // kontrola duplicity
+    const existing = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (existing) {
+      return res.status(409).json({ error: "Používateľ s týmto e-mailom už existuje." });
     }
 
     const newUser = await prisma.user.create({
       data: {
+        firstName,
+        lastName,
         email,
-        active: false,
+        phone: phone || null,
+        roleId: roleId || 3, // 3 = rodič (ak sa nezadá, predvolená hodnota)
+        active: active ?? false,
       },
     });
 
-    res.status(201).json(newUser);
+    res.status(201).json({
+      success: true,
+      message: "Používateľ úspešne vytvorený.",
+      data: newUser,
+    });
   } catch (err) {
+    console.error("❌ Chyba pri vytváraní používateľa:", err);
     next(err);
   }
 });
+
 
 // PATCH /api/user/:id
 router.patch("/:id", async (req, res, next) => {
