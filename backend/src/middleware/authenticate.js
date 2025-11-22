@@ -1,4 +1,4 @@
-const { verifyToken, generateToken} = require("../utils/jwt");
+const {verifyToken, generateToken} = require("../utils/jwt");
 
 async function authenticate(req, res, next) {
     try {
@@ -6,25 +6,29 @@ async function authenticate(req, res, next) {
         const refreshToken = req.cookies?.refreshToken;
 
 
-        if (!accessToken && !refreshToken) {
-            return res.status(401).json({ error: "Neautorizovaný prístup." });
+        if (!accessToken) {
+            return res.status(401).json({error: "Neautorizovaný prístup."});
         }
 
-        if (accessToken) {
-            try {
-                const { user } = await verifyToken(accessToken, "access");
-                req.user = user;
-                return next();
-            } catch (err) {
-                console.warn("Access token neplatný alebo expirovaný:", err.message);
+
+        try {
+            const {user} = await verifyToken(accessToken, "access");
+            req.user = user;
+            return next();
+        } catch (err) {
+            console.warn("Access token neplatný", err.message);
+
+            if (err.name !== "TokenExpiredError") {
+                return res.status(401).json({ error: "Neplatný token." });
             }
         }
 
+
         if (!refreshToken) {
-            return res.status(401).json({ error: "Neautorizovaný prístup." });
+            return res.status(401).json({error: "Neautorizovaný prístup."});
         }
         try {
-            const { decoded, user } = await verifyToken(refreshToken, "refresh");
+            const {decoded, user} = await verifyToken(refreshToken, "refresh");
 
             const newAccessToken = generateToken(
                 user.id,
@@ -46,11 +50,11 @@ async function authenticate(req, res, next) {
             console.warn("Refresh token neplatný alebo expirovaný:", err.message);
             res.clearCookie("accessToken");
             res.clearCookie("refreshToken");
-            return res.status(401).json({ error: "Session expirovala, prihlás sa znova." });
+            return res.status(401).json({error: "Session expirovala, prihlás sa znova."});
         }
     } catch (err) {
         console.error("Auth error:", err);
-        return res.status(403).json({ error: "Neplatný alebo expirovaný token." });
+        return res.status(403).json({error: "Neplatný alebo expirovaný token."});
     }
 }
 

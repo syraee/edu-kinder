@@ -56,6 +56,7 @@ export default function Header() {
   const isAuthed = !!user;
   const roleKey = String(roleText || "").toUpperCase();
   const isTeacherOrAdmin = roleKey === "TEACHER" || roleKey === "ADMIN";
+  const isAdmin = roleKey === "ADMIN";
 
   return (
     <div className="govuk-header__wrapper">
@@ -160,6 +161,16 @@ export default function Header() {
                   </li>
                 </>
               )}
+                {isAdmin && (
+                    <>
+                        <li className="govuk-header__navigation-item">
+                            <Link className="govuk-header__link" href="/teachers" title="Učitelia">
+                                Učitelia
+                            </Link>
+                        </li>
+                    </>
+                )}
+
             </ul>
           </div>
         </nav>

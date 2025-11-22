@@ -26,7 +26,7 @@ export default function Home() {
     const search = useSearchParams();
     const token = search.get("token") ?? "";
     // ====== STAV ======
-    const [parent, setParent] = useState({ firstName: "", lastName: "", email: "", phone: "" });
+    const [parent, setParent] = useState({ firstName: "", lastName: "", email: "", phone: "", role: "" });
     const [children, setChildren] = useState<Child[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ export default function Home() {
 
     // ERRORS
     const [parentErr, setParentErr] = useState<Record<keyof typeof parent, FieldError>>({
-        firstName: null, lastName: null, email: null, phone: null,
+        firstName: null, lastName: null, email: null, phone: null, role: null,
     });
 
     interface RawChild {
@@ -72,6 +72,7 @@ export default function Home() {
                     lastName : (data.parent?.lastName  ?? "").trim(),
                     email    : (data.parent?.email     ?? "").trim().toLowerCase(),
                     phone    : normalizePhone(data.parent?.phone ?? ""),
+                    role: (data.parent?.roleId ?? "").trim(),
                 });
 
                 const kids: Child[] = (Array.isArray(data.children) ? data.children : []).map((c: RawChild) => ({
@@ -102,13 +103,14 @@ export default function Home() {
 
 
     function validate(): boolean {
-        const pe: typeof parentErr = { firstName: null, lastName: null, email: null, phone: null };
+        const pe: typeof parentErr = { firstName: null, lastName: null, email: null, phone: null, role: null};
 
 
         const fn = parent.firstName.trim();
         const ln = parent.lastName.trim();
         const em = parent.email.trim().toLowerCase();
         const ph = parent.phone.trim();
+        const rl = parent.role.trim();
 
         if (!fn) pe.firstName = "Meno";
         if (!ln) pe.lastName = "Priezvisko";
@@ -142,6 +144,7 @@ export default function Home() {
                         lastName: parent.lastName.trim(),
                         email: parent.email.trim().toLowerCase(),
                         phone: normalizePhone(parent.phone),
+                        role: String(parent?.role ?? ""),
                     },
 
                     childIds: children.map(c => c.id),
@@ -159,7 +162,7 @@ export default function Home() {
             setSubmitting(false);
         }
     }
-
+    const roleId = Number(parent.role);
     return (
         <>
             <div className="govuk-header__wrapper">
@@ -221,7 +224,6 @@ export default function Home() {
                             {/* RODIČ */}
                             <fieldset className="govuk-fieldset">
                                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-                                    <h2 className="govuk-fieldset__heading">Rodič / zákonný zástupca</h2>
                                 </legend>
 
                                 <div className={`govuk-form-group ${parentErr.firstName ? "govuk-form-group--error" : ""}`}>
@@ -284,6 +286,7 @@ export default function Home() {
                             <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
                             {/* DETI */}
+                            {roleId === 3 && (
                             <fieldset className="govuk-fieldset">
                                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
                                     <h2 className="govuk-fieldset__heading">Dieťa / deti</h2>
@@ -322,7 +325,7 @@ export default function Home() {
                                     );
                                 })}
 
-                            </fieldset>
+                            </fieldset>)}
 
                             <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 

@@ -29,9 +29,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-<<<<<<< HEAD
-// ✅ POST /api/child – vytvorenie nového dieťaťa
-=======
+
 // GET /api/child/mine
 router.get("/mine", authenticate, async (req, res, next) => {
   try {
@@ -60,7 +58,6 @@ router.get("/mine", authenticate, async (req, res, next) => {
   }
 });
 
->>>>>>> 5003ca779113f58f300318f588069378d12a586b
 router.post("/", async (req, res, next) => {
   try {
     const { firstName, lastName, birthDate, groupId } = req.body;

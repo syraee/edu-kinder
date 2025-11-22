@@ -62,6 +62,9 @@ router.get("/teachers", async (req, res, next) => {
     const teachers = await prisma.user.findMany({
       where: { roleId: 2 }, // učitelia
       orderBy: { lastName: "asc" },
+        include: {
+            teachingClasses: true,
+        },
     });
 
     const formatted = teachers.map(t => ({
@@ -69,6 +72,8 @@ router.get("/teachers", async (req, res, next) => {
       firstName: t.firstName,
       lastName: t.lastName,
       email: t.email,
+        phone: t.phone,
+        classes: t.teachingClasses.map((g) => g.name),
     }));
 
     res.json({ success: true, data: formatted });
@@ -77,6 +82,7 @@ router.get("/teachers", async (req, res, next) => {
     next(err);
   }
 });
+
 
 // GET /api/user/:id
 router.get("/:id", async (req, res, next) => {
@@ -178,7 +184,7 @@ router.patch("/:id", async (req, res, next) => {
 });
 
 // DELETE /api/user/:id
-router.delete("/:id", authenticate, authorizeRole(["admin"]), async (req, res, next) => {
+router.delete("/:id", authenticate, authorizeRole(["admin", "teacher"]), async (req, res, next) => {
   try {
     const id = req.params.id;
     const userId = parseInt(id, 10);
