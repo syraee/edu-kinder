@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../../prisma/client");
+const authenticate = require("../middleware/authenticate");
 
 // ✅ GET /api/child – všetky deti s informáciami o triede
 router.get("/", async (req, res, next) => {
@@ -28,7 +29,38 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+<<<<<<< HEAD
 // ✅ POST /api/child – vytvorenie nového dieťaťa
+=======
+// GET /api/child/mine
+router.get("/mine", authenticate, async (req, res, next) => {
+  try {
+    const userId = req.user?.id ?? req.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Not authenticated" });
+    }
+
+    const guardians = await prisma.childGuardian.findMany({
+      where: { userId: Number(userId) },
+      include: {
+        child: true,
+      },
+      orderBy: { childId: "asc" },
+    });
+
+    const children = guardians.map((g) => ({
+      id: g.child.id,
+      firstName: g.child.firstName,
+      lastName: g.child.lastName,
+    }));
+
+    return res.json({ success: true, data: children });
+  } catch (err) {
+    next(err);
+  }
+});
+
+>>>>>>> 5003ca779113f58f300318f588069378d12a586b
 router.post("/", async (req, res, next) => {
   try {
     const { firstName, lastName, birthDate, groupId } = req.body;
