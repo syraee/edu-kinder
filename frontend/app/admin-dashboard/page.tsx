@@ -33,7 +33,7 @@ export default function InviteParentsPage() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
 
-  // 🔹 Načítanie detí z databázy
+  // Načítanie detí z databázy
   useEffect(() => {
     async function fetchChildren() {
       try {
@@ -85,7 +85,7 @@ export default function InviteParentsPage() {
     }
 
     try {
-      // 1️⃣ Vytvorenie rodiča
+      // Vytvorenie rodiča
       const resUser = await fetch(`${API_BASE}/user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,7 +106,7 @@ export default function InviteParentsPage() {
 
       const userId = userData.data.id;
 
-      // 2️⃣ Priradenie detí
+      // Priradenie detí
       for (const childId of selectedChildren) {
         await fetch(`${API_BASE}/guardian/assign`, {
           method: "POST",
@@ -119,7 +119,7 @@ export default function InviteParentsPage() {
         });
       }
 
-      // 3️⃣ Pridanie do zoznamu
+      //Pridanie do zoznamu
       const childNames = children
         .filter(c => selectedChildren.includes(String(c.id)))
         .map(c => `${c.firstName} ${c.lastName}`);
@@ -131,7 +131,7 @@ export default function InviteParentsPage() {
         children: childNames,
       }]);
 
-      // 4️⃣ Reset formulára
+      // Reset formulára
       setEmailInput("");
       setFirstName("");
       setLastName("");

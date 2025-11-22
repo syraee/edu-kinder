@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const prisma = require("../../prisma/client");
 
-// GET /api/child
+// ✅ GET /api/child – všetky deti s informáciami o triede
 router.get("/", async (req, res, next) => {
   try {
     const children = await prisma.child.findMany({
@@ -28,25 +28,8 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/", async (req, res, next) => {
-    // #swagger.tags = ['Children']
-    // #swaggers.summary = 'Get all children in kindergarten
-    try{
-        const children = await prisma.child.findMany();
-        res.json({
-            success: true,
-            data: children
-        })
-    }catch (err) {
-        next(err);
-    }
-})
-
+// ✅ POST /api/child – vytvorenie nového dieťaťa
 router.post("/", async (req, res, next) => {
-  // #swagger.tags = ['Children']
-  // #swagger.summary = 'Create a new child'
-  // #swagger.description = 'Creates a new child record in DB'
-
   try {
     const { firstName, lastName, birthDate, groupId } = req.body;
 
@@ -80,5 +63,33 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// ✅ PATCH /api/child/:id – úprava údajov dieťaťa
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid child ID" });
+
+    const { firstName, lastName, groupName, className } = req.body;
+
+    // získať ID triedy podľa mena
+    const group = await prisma.groupClass.findFirst({
+      where: { name: groupName },
+    });
+
+    const updatedChild = await prisma.child.update({
+      where: { id },
+      data: {
+        firstName,
+        lastName,
+        groupId: group ? group.id : null,
+      },
+    });
+
+    res.json({ success: true, data: updatedChild });
+  } catch (err) {
+    console.error("❌ Error updating child:", err);
+    next(err);
+  }
+});
 
 module.exports = router;

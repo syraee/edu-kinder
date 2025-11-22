@@ -28,6 +28,16 @@ export default function StudentsPage() {
   const [activeClass, setActiveClass] = useState<string>("Všetci");
   const [loading, setLoading] = useState(true);
 
+  const [editingChild, setEditingChild] = useState<Child | null>(null);
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    groupName: "",
+    className: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [banner, setBanner] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -55,6 +65,59 @@ export default function StudentsPage() {
     activeClass === "Všetci"
       ? children
       : children.filter((c) => c.groupName === activeClass);
+
+  const openEditModal = (child: Child) => {
+    setEditingChild(child);
+    setEditForm({
+      firstName: child.firstName,
+      lastName: child.lastName,
+      groupName: child.groupName,
+      className: child.className,
+    });
+  };
+
+  const closeEditModal = () => {
+    setEditingChild(null);
+    setBanner(null);
+  };
+
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const saveChanges = async () => {
+    if (!editingChild) return;
+    setSaving(true);
+    setBanner(null);
+
+    try {
+      const res = await fetch(`${API_BASE}/child/${editingChild.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Nepodarilo sa uložiť zmeny.");
+
+      // Aktualizovať lokálny zoznam
+      setChildren((prev) =>
+        prev.map((c) =>
+          c.id === editingChild.id ? { ...c, ...editForm } : c
+        )
+      );
+
+      setBanner({ type: "success", text: "Zmeny boli uložené." });
+      setTimeout(() => closeEditModal(), 1200);
+    } catch (err: any) {
+      setBanner({ type: "error", text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <>
@@ -112,13 +175,131 @@ export default function StudentsPage() {
                 </div>
                 <div className="student-card__actions">
                   <button className="govuk-button govuk-button--secondary">Detail</button>
-                  <button className="govuk-button govuk-button--warning">Upraviť</button>
+                  <button
+                    className="govuk-button govuk-button--warning"
+                    type="button"
+                    onClick={() => openEditModal(child)}
+                  >
+                    Upraviť
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* 🔹 Modal na úpravu dieťaťa */}
+      {editingChild && (
+        <div
+          className="govuk-modal"
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            className="govuk-panel govuk-panel--confirmation"
+            style={{
+              backgroundColor: "white",
+              color: "black",
+              padding: "2rem",
+              borderRadius: "0.5rem",
+              maxWidth: "500px",
+              width: "90%",
+            }}
+          >
+            <h2 className="govuk-heading-m">Upraviť údaje dieťaťa</h2>
+
+            <div className="govuk-form-group">
+              <label className="govuk-label">Meno</label>
+              <input
+                type="text"
+                name="firstName"
+                className="govuk-input"
+                value={editForm.firstName}
+                onChange={handleEditChange}
+              />
+            </div>
+
+            <div className="govuk-form-group">
+              <label className="govuk-label">Priezvisko</label>
+              <input
+                type="text"
+                name="lastName"
+                className="govuk-input"
+                value={editForm.lastName}
+                onChange={handleEditChange}
+              />
+            </div>
+
+            <div className="govuk-form-group">
+              <label className="govuk-label">Trieda</label>
+              <select
+                name="groupName"
+                className="govuk-select"
+                value={editForm.groupName}
+                onChange={handleEditChange}
+              >
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.name}>
+                    {cls.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="govuk-form-group">
+              <label className="govuk-label">Ročník</label>
+              <input
+                type="text"
+                name="className"
+                className="govuk-input"
+                value={editForm.className}
+                onChange={handleEditChange}
+              />
+            </div>
+
+            {banner && (
+              <div
+                className={`govuk-notification-banner govuk-!-margin-top-4 ${
+                  banner.type === "success"
+                    ? "govuk-notification-banner--success"
+                    : ""
+                }`}
+                role="region"
+              >
+                <div className="govuk-notification-banner__content">
+                  <p className="govuk-body">{banner.text}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="govuk-button-group govuk-!-margin-top-4">
+              <button
+                type="button"
+                className="govuk-button"
+                onClick={saveChanges}
+                disabled={saving}
+              >
+                {saving ? "Ukladám…" : "Uložiť zmeny"}
+              </button>
+              <button
+                type="button"
+                className="govuk-button govuk-button--secondary"
+                onClick={closeEditModal}
+              >
+                Zrušiť
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -5,7 +5,7 @@ const authenticate = require("../middleware/authenticate");
 const authorizeRole = require("../middleware/authorizeRole");
 
 
-// ✅ GET /api/user/parents – všetci rodičia + ich deti
+//GET /api/user/parents – všetci rodičia + ich deti
 router.get("/parents", async (req, res, next) => {
   try {
     const parents = await prisma.user.findMany({

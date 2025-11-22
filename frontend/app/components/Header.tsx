@@ -129,18 +129,18 @@ export default function Header() {
                     </Link>
                   </li>
                   <li className="govuk-header__navigation-item">
-                    <Link className="govuk-header__link" href="/dochadzka" title="Dochádzka">
+                    <Link className="govuk-header__link" href="/attendance" title="Dochádzka">
                       Dochádzka
                     </Link>
                   </li>
                   <li className="govuk-header__navigation-item">
-                    <Link className="govuk-header__link" href="/podujatia" title="Podujatia">
+                    <Link className="govuk-header__link" href="/events" title="Podujatia">
                       Podujatia
                     </Link>
                   </li>
                   <li className="govuk-header__navigation-item">
-                    <Link className="govuk-header__link" href="/oznamy" title="Oznamy">
-                      Oznámy
+                    <Link className="govuk-header__link" href="/announcement" title="Oznamy">
+                      Oznamy
                     </Link>
                   </li>
                 </>

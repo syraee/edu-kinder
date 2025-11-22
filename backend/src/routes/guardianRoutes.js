@@ -35,7 +35,7 @@ router.post("/assign", async (req, res, next) => {
       data: {
         userId: parseInt(userId, 10),
         childId: parseInt(childId, 10),
-        relationship: relationship || "parent", // 🔹 default hodnota
+        relationship: relationship || "parent", //default hodnota
       },
     });
 
