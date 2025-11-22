@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../../prisma/client");
+const authenticate = require("../middleware/authenticate");
 
 // GET /api/child
 router.get("/", async (req, res, next) => {
@@ -28,19 +29,33 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/", async (req, res, next) => {
-    // #swagger.tags = ['Children']
-    // #swaggers.summary = 'Get all children in kindergarten
-    try{
-        const children = await prisma.child.findMany();
-        res.json({
-            success: true,
-            data: children
-        })
-    }catch (err) {
-        next(err);
+// GET /api/child/mine
+router.get("/mine", authenticate, async (req, res, next) => {
+  try {
+    const userId = req.user?.id ?? req.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Not authenticated" });
     }
-})
+
+    const guardians = await prisma.childGuardian.findMany({
+      where: { userId: Number(userId) },
+      include: {
+        child: true,
+      },
+      orderBy: { childId: "asc" },
+    });
+
+    const children = guardians.map((g) => ({
+      id: g.child.id,
+      firstName: g.child.firstName,
+      lastName: g.child.lastName,
+    }));
+
+    return res.json({ success: true, data: children });
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.post("/", async (req, res, next) => {
   // #swagger.tags = ['Children']

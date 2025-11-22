@@ -47,6 +47,7 @@ model Child {
   group     GroupClass? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   guardians ChildGuardian[]
+  mealAttendances MealAttendance[]
 }
 
 model ChildGuardian {
@@ -86,4 +87,16 @@ model Session {
   userId    Int
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model MealAttendance {
+  id        Int      @id @default(autoincrement())
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId   Int
+  date      DateTime
+  mask      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([childId, date])
+  @@index([date])
 }
