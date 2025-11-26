@@ -45,6 +45,7 @@ export default function Home() {
     }
 
     useEffect(() => {
+        let shouldSetLoadingFalse = true;
         (async () => {
             try {
                 if (!token) {
@@ -59,6 +60,7 @@ export default function Home() {
                 });
 
                 if (res.status === 409) {
+                    shouldSetLoadingFalse = false;
                     const data = await res.json().catch(() => ({}));
                     window.location.href = "/login";
                     return;
@@ -85,7 +87,9 @@ export default function Home() {
             } catch (e) {
                 setPrefillError("Nepodarilo sa načítať údaje.");
             } finally {
-                setLoading(false);
+                if (shouldSetLoadingFalse) {
+                    setLoading(false);
+                }
             }
         })();
     }, [token]);
@@ -162,8 +166,28 @@ export default function Home() {
             setSubmitting(false);
         }
     }
+
+    if (loading) {
+        return (
+            <>
+                <div className="govuk-header__wrapper">
+                    {/* ... celý tvoj header tak ako máš hore ... */}
+                </div>
+
+                <div className="govuk-width-container">
+                    <main className="govuk-main-wrapper auth-center" id="main-content" role="main">
+                        <div className="auth-form">
+                            <h1 className="govuk-heading-xl">Registrácia</h1>
+                            <p className="govuk-body">Overujeme váš registračný odkaz…</p>
+                        </div>
+                    </main>
+                </div>
+            </>
+        );
+    }
     const roleId = Number(parent.role);
-    return (
+
+        return (
         <>
             <div className="govuk-header__wrapper">
                 <header className="govuk-header idsk-shadow-head" data-module="govuk-header">
@@ -256,13 +280,14 @@ export default function Home() {
 
                                 <div className={`govuk-form-group ${parentErr.email ? "govuk-form-group--error" : ""}`}>
                                     <label className="govuk-label" htmlFor="parent-email">E-mail</label>
+                                    <span className="govuk-hint">E-mail je daný pozvánkou a nedá sa zmeniť.</span>
                                     <input
                                         className={`govuk-input govuk-input--width-20`}
                                         id="parent-email"
                                         type="email"
                                         autoComplete="email"
                                         value={parent.email}
-                                        readOnly
+                                        disabled
                                     />
                                 </div>
 
