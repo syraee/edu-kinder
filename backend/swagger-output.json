@@ -11,13 +11,19 @@
     "http"
   ],
   "paths": {
+    "/user/parents": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/user/": {
       "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Get all users",
-        "description": "Fetches all users from the database",
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -25,11 +31,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Create a new user",
-        "description": "Create a new user",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -37,7 +39,22 @@
             "schema": {
               "type": "object",
               "properties": {
+                "firstName": {
+                  "example": "any"
+                },
+                "lastName": {
+                  "example": "any"
+                },
                 "email": {
+                  "example": "any"
+                },
+                "phone": {
+                  "example": "any"
+                },
+                "roleId": {
+                  "example": "any"
+                },
+                "active": {
                   "example": "any"
                 }
               }
@@ -50,17 +67,26 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/user/teachers": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
     },
     "/user/{id}": {
       "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Get a user",
-        "description": "Get a user by his ID",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -82,11 +108,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Updates existing user",
-        "description": "Updates existing user. These parameters can be updated: firstName, lastName, role, email, active, phone",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -135,16 +157,17 @@
         }
       },
       "delete": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Delete user",
-        "description": "Delete user by Id",
+        "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           }
         ],
@@ -155,8 +178,17 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -166,12 +198,17 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "email": {
+                "emails": {
                   "example": "any"
                 }
               }
@@ -182,8 +219,131 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/auth/register/prefill": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/auth/register/complete": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "example": "any"
+                },
+                "parent": {
+                  "example": "any"
+                },
+                "childIds": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -236,22 +396,31 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
           "400": {
             "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
     },
-    "/auth/verify": {
+    "/auth/register/verify": {
       "get": {
         "description": "",
         "parameters": [
@@ -271,11 +440,21 @@
         }
       }
     },
+    "/auth/refresh": {
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/child/": {
       "get": {
-        "tags": [
-          "Children"
-        ],
         "description": "",
         "responses": {
           "200": {
@@ -284,11 +463,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Children"
-        ],
-        "summary": "Create a new child.",
-        "description": "Create a new child.",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -302,7 +477,10 @@
                 "lastName": {
                   "example": "any"
                 },
-                "startDate": {
+                "birthDate": {
+                  "example": "any"
+                },
+                "groupId": {
                   "example": "any"
                 }
               }
@@ -312,6 +490,71 @@
         "responses": {
           "201": {
             "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/child/mine": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/child/{id}": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "example": "any"
+                },
+                "lastName": {
+                  "example": "any"
+                },
+                "groupName": {
+                  "example": "any"
+                },
+                "className": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -342,6 +585,240 @@
           },
           "400": {
             "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/guardian/assign": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "childId": {
+                  "example": "any"
+                },
+                "relationship": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/group/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "classLetter": {
+                  "example": "any"
+                },
+                "classYear": {
+                  "example": "any"
+                },
+                "teacherId": {
+                  "example": "any"
+                },
+                "roomName": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/meals/attendance": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "childIds",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "example": "any"
+                },
+                "entries": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/photo/": {
+      "post": {
+        "tags": [
+          "Photos"
+        ],
+        "summary": "Nahraj fotku na server do štruktúry podľa školského roku a udalosti",
+        "description": "",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "photo",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Fotka, ktorá sa má nahrať"
+          },
+          {
+            "name": "schoolYear",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Školský rok, napr. 2025/26"
+          },
+          {
+            "name": "eventName",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Názov udalosti, napr. LetnyFestival"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "schoolYear": {
+                  "example": "any"
+                },
+                "eventName": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Foto úspešne nahraté",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Foto nahraté!"
+                },
+                "filePath": {
+                  "type": "string",
+                  "example": "uploads/2025-26/LetnyFestival/1699112345678-123456789.jpg"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Chýbajúce polia alebo žiadny súbor"
           }
         }
       }

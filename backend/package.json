@@ -18,8 +18,10 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
     "prisma": "^6.19.0",
+    "sharp": "^0.34.5",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
   },
