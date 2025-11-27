@@ -150,7 +150,7 @@ export default function Header() {
                 <>
                   <li className="govuk-header__navigation-item">
                     <Link className="govuk-header__link" href="/kids" title="Deti">
-                      Deti
+                      Triedy
                     </Link>
                   </li>
                   <li className="govuk-header__navigation-item">

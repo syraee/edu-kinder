@@ -1,4 +1,4 @@
-import "./globals.css";
+import "./styles/globals.css";
 import "./styles/application.scss";
 
 
@@ -7,7 +7,7 @@ export const metadata = {
   title: "EduKinder",
   description: "kindergarden",
   icons: {
-    icon: "/icon.png",
+    icon: "idsk-assets/images/icon.png",
   },
 };
 

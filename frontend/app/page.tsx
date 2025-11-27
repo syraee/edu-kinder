@@ -1,26 +1,29 @@
+"use client";
 
+import Header from "@/app/components/Header";
 import Link from "next/link";
-import Header from '@/app/components/Header';
 
-
-export default function Home() {
+export default function HomePage() {
   return (
     <>
-   
-   <Header />
+      <Header />
 
-      {/* BODY */}
-      <div className="govuk-main-wrapper govuk-width-container idsk-docs">
-        <div className="idsk-docs__wrap">
-
-          <div className="idsk-docs__row">
-            <main className="idsk-docs__content">
-              <h1 className="govuk-heading-xl">Vitajte na webe EduKinder!
-              </h1>
-            </main>
-          </div>
-        </div>
-      </div>
+      <main
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "70vh",
+          flexDirection: "column",
+          textAlign: "center",
+        }}
+      >
+        <h1 className="govuk-heading-xl">Vitajte na webe EduKinder!</h1>
+        <p className="govuk-body-l" style={{ maxWidth: "500px" }}>
+          Tento portál slúži na jednoduchú správu škôlky — prístup k dochádzke, strave,
+          triedam, rodičom a oznamom.
+        </p>
+      </main>
     </>
   );
 }
