@@ -29,11 +29,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-<<<<<<< HEAD
-=======
-
 // GET /api/child/mine
->>>>>>> a21927389145061d510966e42c298e4c8224fa8f
 router.get("/mine", authenticate, async (req, res, next) => {
   try {
     const userId = req.user?.id ?? req.userId;
@@ -61,10 +57,6 @@ router.get("/mine", authenticate, async (req, res, next) => {
   }
 });
 
-<<<<<<< HEAD
-
-=======
->>>>>>> a21927389145061d510966e42c298e4c8224fa8f
 router.post("/", async (req, res, next) => {
   try {
     const { firstName, lastName, birthDate, groupId } = req.body;
