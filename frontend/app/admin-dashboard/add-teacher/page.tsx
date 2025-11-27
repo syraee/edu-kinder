@@ -13,7 +13,7 @@ interface AddedTeachers {
 }
 
 export default function InviteTeachersPage() {
-    const [title, setTitle] = useState("");
+    //const [title, setTitle] = useState("");
     const [emailInput, setEmailInput] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -55,13 +55,13 @@ export default function InviteTeachersPage() {
             return;
         }
 
-        const fullFirstName = `${title.trim()} ${firstName.trim()}`.trim();
+        //const fullFirstName = `${title.trim()} ${firstName.trim()}`.trim();
         try {
             const resUser = await fetch(`${API_BASE}/user`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    firstName: fullFirstName,
+                    firstName: firstName,
                     lastName,
                     email: candidate,
                     phone,
@@ -81,12 +81,12 @@ export default function InviteTeachersPage() {
                 {
                     id: userId,
                     email: candidate,
-                    firstName: fullFirstName,
+                    firstName: firstName,
                     lastName,
                 },
             ]);
 
-            setTitle("");
+            //setTitle("");
             setEmailInput("");
             setFirstName("");
             setLastName("");
@@ -170,11 +170,11 @@ export default function InviteTeachersPage() {
                         <h1 className="govuk-heading-xl">Pozvanie učiteľov – vytvorenie konta</h1>
 
                         <form onSubmit={addEmail} className="govuk-!-margin-bottom-6">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label">Titul</label>
-                                <input className="govuk-input govuk-!-width-one-quarter"
-                                       value={title} onChange={(e) => setTitle(e.target.value)} />
-                            </div>
+                            {/*<div className="govuk-form-group">*/}
+                            {/*    <label className="govuk-label">Titul</label>*/}
+                            {/*    <input className="govuk-input govuk-!-width-one-quarter"*/}
+                            {/*           value={title} onChange={(e) => setTitle(e.target.value)} />*/}
+                            {/*</div>*/}
                             <div className="govuk-form-group">
                                 <label className="govuk-label">Meno</label>
                                 <input className="govuk-input govuk-!-width-one-half"
