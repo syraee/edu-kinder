@@ -36,7 +36,11 @@ async function verifyToken(token, expectedType) {
 
         if (decoded.type !== expectedType) {
             console.warn(`Token type mismatch: expected ${expectedType}, got ${decoded.type}`);
-            return null;
+            const err = new Error(
+                `Token type mismatch: expected ${expectedType}, got ${decoded.type}`
+            );
+            err.name = "TokenTypeMismatchError";
+            throw err;
         }
 
         const user = await prisma.user.findUnique({
@@ -46,6 +50,9 @@ async function verifyToken(token, expectedType) {
 
         if (!user) {
             console.warn(`User not found with id ${decoded.userId}`);
+            const err = new Error(`User not found with id ${decoded.userId}`);
+            err.name = "UserNotFoundError";
+            throw err;
         }
 
         return {decoded, user};

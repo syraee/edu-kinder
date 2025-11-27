@@ -216,7 +216,7 @@ export default function PrihlaseniePage() {
                                     </div>
                                     <div className="govuk-notification-banner__content">
                                         <p className="govuk-body">
-                                            Odkaz na prihlásenie sme poslali na <strong>{email || "zadaný e-mail"}</strong>. Platí 10 minút a je jednorazový.
+                                            Odkaz na prihlásenie sme poslali na <strong>{email || "zadaný e-mail"}</strong>. Platí 15 minút a je jednorazový.
                                         </p>
                                     </div>
                                 </div>
