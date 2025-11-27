@@ -1,0 +1,21 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/c2704_next_dist_9abeec94._.js",
+      "static/chunks/edu-kinder_app_favicon_ico_mjs_c58d8551._.js",
+      "static/chunks/edu-kinder_app_0176120a._.css",
+      "static/chunks/c2704_@id-sk_frontend_dist_govuk_all_mjs_62680be3._.js",
+      "static/chunks/edu-kinder_app_components_IdskInit_tsx_1030aca5._.js",
+      "static/chunks/edu-kinder_app_layout_tsx_ff9101ef._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_27663995._.js",
+      "static/chunks/c2704_next_dist_compiled_react-dom_6d1cc3e4._.js",
+      "static/chunks/c2704_next_dist_compiled_next-devtools_index_bf93bcc1.js",
+      "static/chunks/c2704_next_dist_compiled_35e32b2e._.js",
+      "static/chunks/c2704_next_dist_client_a9333058._.js",
+      "static/chunks/c2704_next_dist_de244e0f._.js",
+      "static/chunks/c2704_@swc_helpers_cjs_6de78c87._.js",
+      "static/chunks/edu-kinder_a0ff3932._.js",
+      "static/chunks/turbopack-edu-kinder_f2069c12._.js"
+    ]
+  }
+}

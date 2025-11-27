@@ -15,14 +15,16 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
-  firstName String
-  lastName  String
-  role      Role      @relation(fields: [roleId], references: [id])
-  roleId    Int
+  firstName String?
+  lastName  String?
+  role      Role?      @relation(fields: [roleId], references: [id])
+  roleId    Int?
   email     String    @unique
   active    Boolean
+  phone     String?
   createdAt DateTime  @default(now())
 
+  teachingClasses GroupClass[]
   children  ChildGuardian[]
   loginTokens LoginToken[]
   sessions  Session[]
@@ -39,19 +41,34 @@ model Child {
   firstName String
   lastName  String
   startDate DateTime
-  groupId   Int
+  groupId   Int?
+  birthday  DateTime?
   createdAt DateTime   @default(now())
+  group     GroupClass? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   guardians ChildGuardian[]
+  mealAttendances MealAttendance[]
 }
 
 model ChildGuardian {
   id         Int   @id @default(autoincrement())
-  user       User  @relation(fields: [userId], references: [id])
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
   relationship String
   child      Child @relation(fields: [childId], references: [id])
   childId    Int
+}
+
+model GroupClass {
+  id           Int      @id @default(autoincrement())
+  name         String
+  class        String
+  classYear    DateTime
+  classTeacherId  Int?
+  classTeacher    User?    @relation(fields: [classTeacherId], references: [id], onDelete: SetNull)
+  roomName        String
+
+  children     Child[]
 }
 
 model LoginToken {
@@ -70,4 +87,16 @@ model Session {
   userId    Int
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model MealAttendance {
+  id        Int      @id @default(autoincrement())
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId   Int
+  date      DateTime
+  mask      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([childId, date])
+  @@index([date])
 }

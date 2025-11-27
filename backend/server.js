@@ -1,20 +1,43 @@
+require("dotenv").config()
 const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Requires
+const swaggerUi = require("swagger-ui-express");
+const cors = require('cors');
 const routes = require("./src/routes/routes");
 const errorHandler = require("./src/middleware/errorHandler");
+const swaggerFile = require("./swagger-output.json");
+const cookieParser = require("cookie-parser");
 
-app.use("/api", routes);
+const app = express();
+const PORT = process.env.PORT || 5000;
+const ORIGIN = 'http://localhost:3000';
+app.use(cors({ origin: ORIGIN, credentials: true }));
+
+// fallback, keby niečo prešlo mimo cors() – nech je 100% istota
 app.use((req, res, next) => {
-    const err = new Error("Route not found");
-    err.statusCode = 404;
-    next(err);
+    res.header('Access-Control-Allow-Origin', ORIGIN);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
 });
-app.use(errorHandler);
-app.use(express.json());
 
+//Middleware
+app.use(express.json());
+app.use(cookieParser());
+app.use("/api", routes);
+app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
+
+app.get("/", (req, res) => {
+    res.redirect("/api-docs");
+});
+
+
+//Error handler
+app.use(errorHandler);
 // Start server
 app.listen(PORT, () => {
     console.log(`\nServer is running!\n`);

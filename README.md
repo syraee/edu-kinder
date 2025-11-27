@@ -26,28 +26,41 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 # Backend (Node.js + Express)
 
 1. Navigate to the backend folder:
+    ```bash
+      cd backend
+    ```
+2. Install dependencies: 
 
-```bash
-  cd backend
-```
-
-2. Install dependencies:
-
-```bash
-  npm install
-```
+    ```bash
+      npm install
+    ```
 
 3. Start the server in development mode
+   ```bash
+      npm run dev
+   ```
 
-```bash
-  npm run dev
-```
-
-By default, the backend runs on http://localhost:5000
+By default, the backend runs on http://localhost:5000/api 
 .
 You should see:
 
 Server running on port 5000
+
+(Optional) - For writing API docs install swagger and swagger-autogen: 
+```bash
+  cd backend
+```
+```bash
+  npm install swagger-ui-express
+``` 
+
+```bash
+  npm install swagger-autogen
+```
+If you want to create new docs for endpoints type:
+```bash
+  node swagger.js
+```
 
 ## Database
 
@@ -58,8 +71,12 @@ for database management. Follow these steps to set it up locally:
 
    1. Docker 
    2. Node.js and npm
-   3. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
-   
+   3. Install Prisma client
+      ```bash
+        npm install prisma @prisma/client
+      ```
+   4. (Optional) pgAdmin or VS Code PostgreSQL Extension for browsing data
+
 2. Start PostgreSQL
     In the backend folder, there is a docker-compose.yml file. Run:
 

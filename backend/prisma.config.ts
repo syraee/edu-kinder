@@ -1,4 +1,4 @@
-import "dotenv/config"; // <-- toto načíta premenné zo súboru .env
+import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({

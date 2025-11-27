@@ -9,6 +9,7 @@
 # ------------------------
 frontend/node_modules/
 backend/node_modules/
+node_modules/
 .pnp
 .pnp.*
 .yarn/*
@@ -81,3 +82,4 @@ Thumbs.db
 # ------------------------
 *.tsbuildinfo
 next-env.d.ts
+node_modules

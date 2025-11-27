@@ -1,15 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { MenuData, DayMenu, MealSection } from "../api/menu/route";
+import type { MenuData, DayMenu, MealItem } from "../api/menu/types";
 
 interface MenuDisplayProps {
-  pdfUrl: string;
+  autoFetch?: boolean;
+  sourceUrl?: string;
 }
 
-export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
+export default function MenuDisplay({
+  autoFetch = false,
+  sourceUrl,
+}: MenuDisplayProps) {
   const [menuData, setMenuData] = useState<MenuData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPdfInfo, setSelectedPdfInfo] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -17,9 +22,11 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `/api/menu?url=${encodeURIComponent(pdfUrl)}`
-        );
+        const url = sourceUrl
+          ? `/api/menu?source=${encodeURIComponent(sourceUrl)}`
+          : `/api/menu`;
+        const response = await fetch(url, { cache: "no-store" });
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -27,6 +34,10 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
         }
 
         setMenuData(data);
+
+        if (data.selectedPdf) {
+          setSelectedPdfInfo(data.selectedPdf.label);
+        }
       } catch (err) {
         console.error("Error fetching menu:", err);
         setError(err instanceof Error ? err.message : "Failed to load menu");
@@ -36,7 +47,7 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
     };
 
     fetchMenu();
-  }, [pdfUrl]);
+  }, [autoFetch, sourceUrl]);
 
   if (loading) {
     return (
@@ -61,14 +72,16 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
           <div className="govuk-error-summary__body">
             <p className="govuk-body">{error || "Neznáma chyba"}</p>
             <p className="govuk-body">
-              <a
-                href={pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="govuk-link"
-              >
-                Otvoriť pôvodný PDF súbor
-              </a>
+              {menuData?.pdfUrl && (
+                <a
+                  href={menuData.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="govuk-link"
+                >
+                  Otvoriť pôvodný PDF súbor
+                </a>
+              )}
             </p>
           </div>
         </div>
@@ -78,7 +91,23 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
 
   return (
     <div className="menu-display">
-      {/* Menu Table */}
+      {selectedPdfInfo && (
+        <div className="govuk-notification-banner" role="region">
+          <div className="govuk-notification-banner__content">
+            <p className="govuk-body">
+              <span
+                className="material-icons"
+                style={{ verticalAlign: "middle", fontSize: "1.2em" }}
+              >
+                calendar_today
+              </span>{" "}
+              Zobrazený jedálny lístok: <strong>{selectedPdfInfo}</strong>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Tabuľka jedálneho lístka */}
       <div className="menu-table-container">
         <table className="menu-table">
           <thead>
@@ -103,7 +132,7 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
         </table>
       </div>
 
-      {/* Footer Information */}
+      {/* Pätička s informáciami */}
       {menuData.allergenLegend && (
         <div className="menu-footer">
           <div className="govuk-inset-text">
@@ -112,6 +141,16 @@ export default function MenuDisplay({ pdfUrl }: MenuDisplayProps) {
         </div>
       )}
     </div>
+  );
+}
+
+function MealCell({ item }: { item?: MealItem }) {
+  return (
+    <>
+      <td className="menu-dish-cell">{item?.name || ""}</td>
+      <td className="menu-portion-cell">{item?.portion || ""}</td>
+      <td className="menu-allergen-cell">{item?.allergens || ""}</td>
+    </>
   );
 }
 
@@ -127,7 +166,6 @@ function DayRow({ day }: { day: DayMenu }) {
     <>
       {Array.from({ length: maxRows }).map((_, rowIndex) => (
         <tr key={rowIndex}>
-          {/* Date cell - only show on first row */}
           {rowIndex === 0 && (
             <td rowSpan={maxRows} className="menu-date-cell">
               <div className="menu-date-content">
@@ -138,38 +176,9 @@ function DayRow({ day }: { day: DayMenu }) {
             </td>
           )}
 
-          {/* Breakfast */}
-          <td className="menu-dish-cell">
-            {day.breakfast.items[rowIndex]?.name || ""}
-          </td>
-          <td className="menu-portion-cell">
-            {day.breakfast.items[rowIndex]?.portion || ""}
-          </td>
-          <td className="menu-allergen-cell">
-            {day.breakfast.items[rowIndex]?.allergens || ""}
-          </td>
-
-          {/* Lunch */}
-          <td className="menu-dish-cell">
-            {day.lunch.items[rowIndex]?.name || ""}
-          </td>
-          <td className="menu-portion-cell">
-            {day.lunch.items[rowIndex]?.portion || ""}
-          </td>
-          <td className="menu-allergen-cell">
-            {day.lunch.items[rowIndex]?.allergens || ""}
-          </td>
-
-          {/* Snack */}
-          <td className="menu-dish-cell">
-            {day.snack.items[rowIndex]?.name || ""}
-          </td>
-          <td className="menu-portion-cell">
-            {day.snack.items[rowIndex]?.portion || ""}
-          </td>
-          <td className="menu-allergen-cell">
-            {day.snack.items[rowIndex]?.allergens || ""}
-          </td>
+          <MealCell item={day.breakfast.items[rowIndex]} />
+          <MealCell item={day.lunch.items[rowIndex]} />
+          <MealCell item={day.snack.items[rowIndex]} />
         </tr>
       ))}
     </>

@@ -18,6 +18,7 @@
     "canvas": "^3.2.0",
     "cheerio": "^1.1.2",
     "next": "15.5.6",
+    "pdfjs-dist": "^4.7.76",
     "pdf-parse": "^1.1.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",

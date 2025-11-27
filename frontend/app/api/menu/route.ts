@@ -1,57 +1,159 @@
 export const runtime = "nodejs";
 
-// Definície typov (zachovať pre MenuDisplay komponent)
-export interface MealItem {
-  name: string;
-  portion: string;
-  allergens: string;
+type UrlCandidate = {
+  url: string;
+  label: string;
+};
+
+type ScrapedPdf = {
+  href: string;
+  text: string;
+  filename: string;
+  dateMatch?: string;
+};
+
+// Vygeneruje kandidátov URL pre aktuálny týždeň na základe dátumových vzorov
+function generateWeekUrlCandidates(date: Date): UrlCandidate[] {
+  const candidates: UrlCandidate[] = [];
+  const baseUrl = "https://www.upjs.sk/app/uploads/sites/26";
+
+  // Zisti pondelok v aktuálnom týždni
+  const dayOfWeek = date.getDay();
+  const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+  const monday = new Date(date);
+  monday.setDate(diff);
+
+  for (let weekOffset = 1; weekOffset >= -1; weekOffset--) {
+    const weekMonday = new Date(monday);
+    weekMonday.setDate(monday.getDate() + weekOffset * 7);
+
+    const friday = new Date(weekMonday);
+    friday.setDate(weekMonday.getDate() + 4);
+
+    // Zobrazenie dátumu ako DD.MM.RRRR
+    const mondayStr = formatDate(weekMonday);
+    const fridayStr = formatDate(friday);
+
+    // Skrátený formát v názve súboru: DD-DD.MM.RRRR
+    const shortFormat = `${weekMonday.getDate()}-${friday.getDate()}.${String(
+      friday.getMonth() + 1
+    ).padStart(2, "0")}.${friday.getFullYear()}`;
+
+    const year = weekMonday.getFullYear();
+    const month = String(weekMonday.getMonth() + 1).padStart(2, "0");
+
+    // Štruktúrovaná cesta: /rok/mesiac/názov.pdf
+    candidates.push({
+      url: `${baseUrl}/${year}/${month}/${shortFormat}.pdf`,
+      label: `${mondayStr} - ${fridayStr}`,
+    });
+
+    // Alternatíva: bez zložky rok/mesiac
+    candidates.push({
+      url: `${baseUrl}/${shortFormat}.pdf`,
+      label: `${mondayStr} - ${fridayStr}`,
+    });
+  }
+
+  return candidates;
 }
 
-export interface MealSection {
-  items: MealItem[];
-}
-
-export interface DayMenu {
-  date: string;
-  dayName: string;
-  energyValues: string;
-  breakfast: MealSection;
-  lunch: MealSection;
-  snack: MealSection;
-}
-
-export interface MenuData {
-  weekRange: string;
-  facility: string;
-  pageNumber: string;
-  days: DayMenu[];
-  allergenLegend?: string;
-  notes?: string;
-  chef?: string;
-  headChef?: string;
-  pdfUrl: string;
-}
-
-function extractPageNumber(text: string): string {
-  const match = text.match(/Strana\s+č?\.?\s*(\d+)/i);
-  return match ? match[1] : "1";
+// Formátovanie dátumu na DD.MM.RRRR
+function formatDate(date: Date): string {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
 }
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const pdfUrl = searchParams.get("url");
 
-  if (!pdfUrl) {
-    return new Response(JSON.stringify({ error: "Missing ?url= parameter" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  // Voliteľný zdroj pre scraping (?source=...), inak predvolená stránka škôlky
+  const sourceUrl =
+    searchParams.get("source") ||
+    "https://www.upjs.sk/materska-skola-upejesko/stravovanie/";
 
   try {
-    // Načítanie a parsovanie PDF
-    const pdfResponse = await fetch(pdfUrl, { cache: "no-store" });
+    let pdfUrl: string | null = null;
+    let pdfLabel: string | null = null;
+    let scrapedCount = 0;
 
+    try {
+      // Prvý pokus: vyhľadanie PDF cez scraping
+      const scrapeUrl = new URL("/api/scrape", req.url);
+      scrapeUrl.searchParams.set("url", sourceUrl);
+
+      const scrapeResponse = await fetch(scrapeUrl.toString(), {
+        cache: "no-store",
+      });
+
+      if (scrapeResponse.ok) {
+        const scrapeData = await scrapeResponse.json();
+        const pdfs = scrapeData.pdfs || [];
+        scrapedCount = pdfs.length;
+
+        // Odfiltruj administratívne PDF; uprednostni tie s dátumom
+        const menuPdfs = pdfs.filter((pdf: ScrapedPdf) => {
+          const name = (pdf.filename + pdf.text).toLowerCase();
+          return (
+            !name.includes("zodpovedna") &&
+            !name.includes("zakon") &&
+            (pdf.dateMatch || /\d{2}.*\d{2}.*\d{4}/.test(pdf.filename))
+          );
+        });
+
+        if (menuPdfs.length > 0) {
+          pdfUrl = menuPdfs[0].href;
+          pdfLabel =
+            menuPdfs[0].dateMatch || menuPdfs[0].text || menuPdfs[0].filename;
+        }
+      }
+    } catch (scrapeError) {
+      // Scraping zlyhal – prejdeme na predikciu URL podľa dátumu
+    }
+
+    if (!pdfUrl) {
+      // Druhý pokus: predikcia URL podľa aktuálneho týždňa
+      const now = new Date();
+      const candidates = generateWeekUrlCandidates(now);
+
+      for (const candidate of candidates) {
+        try {
+          const testResponse = await fetch(candidate.url, {
+            method: "HEAD",
+            cache: "no-store",
+          });
+
+          if (
+            testResponse.ok &&
+            testResponse.headers.get("content-type")?.includes("pdf")
+          ) {
+            pdfUrl = candidate.url;
+            pdfLabel = candidate.label;
+            break;
+          }
+        } catch {
+          continue;
+        }
+      }
+    }
+
+    if (!pdfUrl) {
+      // Nenašli sme žiadne PDF
+      return new Response(
+        JSON.stringify({
+          error: "No PDF menus found",
+          message:
+            "Could not find any menu PDFs on the website or predict the current week's URL",
+          sourceUrl,
+        }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Stiahnutie a spracovanie PDF
+    const pdfResponse = await fetch(pdfUrl, { cache: "no-store" });
     if (!pdfResponse.ok) {
       throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
     }
@@ -63,34 +165,32 @@ export async function GET(req: Request) {
     const { parsePDF } = require("./pdf-parser.js");
     const text = await parsePDF(buffer);
 
-    // Parsovanie dát jedálneho lístka
-    const { parseMenuPDF } = require("./pdf-utils.ts");
-    const menuData = {
-      ...parseMenuPDF(text),
-      pageNumber: extractPageNumber(text),
-      pdfUrl,
-    };
+    // Parsovanie štruktúrovaného menu z PDF
+    const { parseMenuFromPDF } = await import("./pdf-layout");
+    const menuData = await parseMenuFromPDF(buffer, text);
 
-    // Validácia
-    if (menuData.days.length === 0) {
-      throw new Error("No menu data found in PDF");
-    }
-
-    return new Response(JSON.stringify(menuData, null, 2), {
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error processing PDF:", error);
     return new Response(
       JSON.stringify({
-        error: "Failed to process PDF",
-        message: error instanceof Error ? error.message : "Unknown error",
-        pdfUrl,
+        ...menuData,
+        autoDiscovered: true,
+        sourceUrl,
+        availablePdfs: scrapedCount,
+        selectedPdf: {
+          url: pdfUrl,
+          label: pdfLabel || pdfUrl.split("/").pop() || "Aktuálny týždeň",
+        },
       }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Chyba v /api/menu:", error);
+    return new Response(
+      JSON.stringify({
+        error: "Nepodarilo sa získať aktuálne menu",
+        message: error instanceof Error ? error.message : "Neznáma chyba",
+        sourceUrl,
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }
