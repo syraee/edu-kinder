@@ -14,20 +14,20 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   firstName String?
   lastName  String?
-  role      Role?      @relation(fields: [roleId], references: [id])
+  role      Role?    @relation(fields: [roleId], references: [id])
   roleId    Int?
-  email     String    @unique
+  email     String   @unique
   active    Boolean
   phone     String?
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   teachingClasses GroupClass[]
-  children  ChildGuardian[]
-  loginTokens LoginToken[]
-  sessions  Session[]
+  children        ChildGuardian[]
+  loginTokens     LoginToken[]
+  sessions        Session[]
 }
 
 model Role {
@@ -37,47 +37,51 @@ model Role {
 }
 
 model Child {
-  id        Int        @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   firstName String
   lastName  String
   startDate DateTime
   groupId   Int?
   birthday  DateTime?
-  createdAt DateTime   @default(now())
+  createdAt DateTime    @default(now())
   group     GroupClass? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
-  guardians ChildGuardian[]
+  guardians       ChildGuardian[]
   mealAttendances MealAttendance[]
+
+  FaceEmbedding FaceEmbedding[]
 }
 
 model ChildGuardian {
-  id         Int   @id @default(autoincrement())
-  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int
+  id           Int    @id @default(autoincrement())
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
   relationship String
-  child      Child @relation(fields: [childId], references: [id])
-  childId    Int
+  child        Child  @relation(fields: [childId], references: [id])
+  childId      Int
 }
 
 model GroupClass {
-  id           Int      @id @default(autoincrement())
-  name         String
-  class        String
-  classYear    DateTime
-  classTeacherId  Int?
-  classTeacher    User?    @relation(fields: [classTeacherId], references: [id], onDelete: SetNull)
-  roomName        String
+  id             Int      @id @default(autoincrement())
+  name           String
+  class          String
+  classYear      DateTime
+  classTeacherId Int?
+  classTeacher   User?    @relation(fields: [classTeacherId], references: [id], onDelete: SetNull)
+  roomName       String
 
   children     Child[]
+  events       EventOnClass[]
+  PhotoOnClass PhotoOnClass[]
 }
 
 model LoginToken {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
   userId    Int
   tokenHash String
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   usedAt    DateTime?
 }
 
@@ -97,6 +101,61 @@ model MealAttendance {
   mask      Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@unique([childId, date])
   @@index([date])
+}
+
+enum FaceRecognitionStatus {
+  pending
+  processing
+  done
+  failed
+}
+
+model EventOnClass {
+  eventId Int
+  classId Int
+
+  event Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  class GroupClass @relation(fields: [classId], references: [id])
+
+  @@id([eventId, classId])
+}
+
+model Event {
+  id         Int            @id @default(autoincrement())
+  name       String
+  schoolYear String
+  photos     Photo[]
+  classes    EventOnClass[]
+}
+
+model PhotoOnClass {
+  photoId Int
+  classId Int
+  photo   Photo      @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  class   GroupClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@id([photoId, classId])
+}
+
+model Photo {
+  id           Int            @id @default(autoincrement())
+  filePath     String
+  eventId      Int
+  event        Event          @relation(fields: [eventId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt @db.Timestamp(6)
+  PhotoOnClass PhotoOnClass[]
+}
+
+model FaceEmbedding {
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  embedding Float[] // InsightFace embedding je pole čísel (napr. 512-dim)
+  createdAt DateTime @default(now())
+
+  @@index([childId])
 }

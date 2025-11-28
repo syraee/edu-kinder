@@ -6,3 +6,4 @@ requests
 onnxruntime
 fastapi
 uvicorn
+python-multipart
