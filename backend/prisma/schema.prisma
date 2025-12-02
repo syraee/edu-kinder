@@ -21,6 +21,7 @@ model User {
   roleId    Int?
   email     String    @unique
   active    Boolean
+  internal  Boolean @default(false)
   phone     String?
   createdAt DateTime  @default(now())
 

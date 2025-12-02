@@ -34,6 +34,8 @@ export default function ParentsPage() {
   const [sortKey, setSortKey] = useState<SortKey>("firstName");
   const [sortAsc, setSortAsc] = useState(true);
 
+  
+//nacitanie rodicov z databazy 
   useEffect(() => {
     async function fetchParents() {
       try {
@@ -54,6 +56,7 @@ export default function ParentsPage() {
     fetchParents();
   }, []);
 
+  // Filtrovanie zoznamu podla vyhladavania v searchBare
   useEffect(() => {
     const lower = searchTerm.toLowerCase();
     const result = parents.filter(
@@ -70,6 +73,7 @@ export default function ParentsPage() {
     setFilteredParents(result);
   }, [searchTerm, parents]);
 
+// Sortovanie stlpcov
   function sortBy(key: SortKey) {
     if (key === sortKey) {
       setSortAsc(!sortAsc);
