@@ -6,20 +6,21 @@ async function authenticate(req, res, next) {
         const refreshToken = req.cookies?.refreshToken;
 
 
-        if (!accessToken) {
+        if (!accessToken && !refreshToken) {
             return res.status(401).json({error: "Neautorizovaný prístup."});
         }
 
+        if (accessToken) {
+            try {
+                const {user} = await verifyToken(accessToken, "access");
+                req.user = user;
+                return next();
+            } catch (err) {
+                console.warn("Access token neplatný", err.message);
 
-        try {
-            const {user} = await verifyToken(accessToken, "access");
-            req.user = user;
-            return next();
-        } catch (err) {
-            console.warn("Access token neplatný", err.message);
-
-            if (err.name !== "TokenExpiredError") {
-                return res.status(401).json({ error: "Neplatný token." });
+                if (err.name !== "TokenExpiredError") {
+                    return res.status(401).json({error: "Neplatný token."});
+                }
             }
         }
 
