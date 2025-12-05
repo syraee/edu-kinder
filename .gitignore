@@ -37,9 +37,9 @@ backend/build/
 # Environment variables
 # ------------------------
 # Local environment variables (do not commit!)
-.env*
-backend/.env*
-frontend/.env*
+#.env*
+#backend/.env*
+#frontend/.env*
 
 # ------------------------
 # Database & ORM
