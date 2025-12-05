@@ -159,6 +159,11 @@ export default function Header() {
                       Rodičia
                     </Link>
                   </li>
+                    <li className="govuk-header__navigation-item">
+                        <Link className="govuk-header__link" href="/payment-management/payment-input-tuition" title="Platby">
+                            Platby
+                        </Link>
+                    </li>
                 </>
               )}
                 {isAdmin && (
