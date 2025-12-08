@@ -64,7 +64,7 @@ export default function ClassFormPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        alert("✅ Trieda bola úspešne vytvorená");
+        alert("Trieda bola úspešne vytvorená");
         setForm({
           className: "",
           schoolYear: "",
