@@ -51,6 +51,7 @@ model Child {
   guardians ChildGuardian[]
   mealAttendances MealAttendance[]
   mealMonthlyStatement MealMonthlyStatement[]
+  payments        Payment[]
 }
 
 model ChildGuardian {
@@ -124,10 +125,12 @@ model PaymentSettings {
   validTo      DateTime?
 
   createdAt    DateTime @default(now())
+  mealMonthlyStatement MealMonthlyStatement[]
 }
 
 model Payment {
   id        Int      @id @default(autoincrement())
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
   childId    Int
   amount    Decimal
   feeType   FeeType   // STRAVA
@@ -154,6 +157,7 @@ model ChangeLog {
 enum MealStatementStatus {
   UNPAID
   PAID
+  PARTIAL
   CANCELED
 }
 
@@ -166,7 +170,6 @@ model MealMonthlyStatement {
   month        DateTime
 
   plannedDays  Int
-  absentDays   Int
 
   breakfastCount Int     @default(0)
   lunchCount     Int     @default(0)
@@ -178,7 +181,8 @@ model MealMonthlyStatement {
   carryOverOut   Decimal @db.Decimal(10, 2)
 
   status         MealStatementStatus @default(UNPAID)
-
+  paymentSettings PaymentSettings? @relation(fields: [paymentSettingsId], references: [id])
+  paymentSettingsId Int?
   qrPayload      String?
 
   generatedAt    DateTime @default(now())

@@ -7,7 +7,7 @@ import Link from "next/link";
 const API_BASE =
     process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
 
-type Parent = {
+type Child = {
     id: string;
     firstName: string;
     lastName: string;
@@ -22,62 +22,78 @@ type Payment = {
 
 export default function PaymentSettingsPage() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [parents, setParents] = useState<Parent[]>([]);
-    const [filteredParents, setFilteredParents] = useState<Parent[]>([]);
-    const [selectedParent, setSelectedParent] = useState<Parent | null>(null);
-    const [paymentAmount, setPaymentAmount] = useState<number | "">("");
+    const [children, setChildren] = useState<Child[]>([]);
+    const [filteredChildren, setFilteredChildren] = useState<Child[]>([]);
+    const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+    const [paymentAmount, setPaymentAmount] = useState<string | "">("");
+    const [paymentDate, setPaymentDate] = useState<string>(new Date().toISOString().slice(0, 10));
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchParents = async () => {
+        const fetchChildren = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`${API_BASE}/child`);
+                setError(null);
+
+                const response = await fetch(`${API_BASE}/child`, {
+                    method: "GET",
+                    credentials: "include",
+                });
                 const data = await response.json();
-                if (data.success) {
-                    setParents(data.data);
+
+                if (response.ok && data.success) {
+                    setChildren(data.data);
                 } else {
-                    setError("Nepodarilo sa načítať rodičov.");
+                    setError(data.error || "Nepodarilo sa načítať deti.");
                 }
             } catch (e) {
-                setError("Chyba pri načítavaní rodičov.");
+                console.error(e);
+                setError("Chyba pri načítavaní detí.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchParents();
+        fetchChildren();
     }, []);
 
 
 
     useEffect(() => {
         const lower = searchTerm.toLowerCase();
-        const filtered = parents.filter(
-            (p) =>
-                (p.firstName && p.firstName.toLowerCase().includes(lower)) ||
-                (p.lastName && p.lastName.toLowerCase().includes(lower))
+        const filtered = children.filter(
+            (c) =>
+                (c.firstName && c.firstName.toLowerCase().includes(lower)) ||
+                (c.lastName && c.lastName.toLowerCase().includes(lower))
         );
-        setFilteredParents(filtered);
-    }, [searchTerm, parents]);
+        setFilteredChildren(filtered);
+    }, [searchTerm, children]);
 
-    const handleSelectParent = (parent:Parent) => {
-        setSelectedParent(parent);
-        setSearchTerm(`${parent.firstName} ${parent.lastName}`);
+    const handleSelectChild = (child: Child) => {
+        setSelectedChild(child);
+        setSearchTerm(`${child.firstName} ${child.lastName}`);
     };
 
     const handleSavePayment = async () => {
-        if (!selectedParent || paymentAmount === "") {
-            setError("Vyplňte všetky polia.");
+        setError(null);
+
+        if (!selectedChild || !paymentAmount || !paymentDate) {
+            setError("Vyplňte dieťa, sumu aj dátum platby.");
+            return;
+        }
+
+        const amountNumber = Number(paymentAmount);
+        if (Number.isNaN(amountNumber) || amountNumber <= 0) {
+            setError("Zadajte platnú sumu väčšiu ako 0.");
             return;
         }
 
         const paymentData = {
-            amount: Number(paymentAmount),
-            parentId: selectedParent.id,
-            feeType: "STRAVNE",
-            paidAt: new Date().toISOString(),
+            amount: amountNumber,
+            childId: selectedChild.id,
+            feeType: "STRAVA",
+            paidAt: paymentDate,
         };
 
         try {
@@ -86,47 +102,31 @@ export default function PaymentSettingsPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify(paymentData),
             });
 
-            const data = await res.json();
-            if (res.ok) {
-                alert("Platba bola úspešne zaznamenaná.");
-                setSearchTerm("");
-                setPaymentAmount("");
-                setSelectedParent(null);
-            } else {
-                setError(data.message || "Nastala chyba pri uložení platby.");
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok || data.success === false) {
+                throw new Error(data.error || data.message || "Nastala chyba pri uložení platby.");
             }
+
+            alert("Platba bola úspešne zaznamenaná.");
+
+            setSelectedChild(null);
+            setSearchTerm("");
+            setPaymentAmount("");
+            setPaymentDate(new Date().toISOString().slice(0, 10));
         } catch (e) {
-            setError("Nastala chyba pri ukladaní platby.");
+            console.error(e);
+            setError(
+                e instanceof Error
+                    ? e.message
+                    : "Nastala chyba pri ukladaní platby."
+            );
         }
     };
-
-    async function deletePaymentFromApi(id: number) {
-        if (!confirm(`Naozaj chceš zmazať platbu s ID ${id}?`)) {
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE}/payment/payments/${id}`, {
-                method: "DELETE",
-                credentials: "include", // kvôli cookies / authenticate
-            });
-
-            const json = await res.json().catch(() => ({}));
-
-            if (!res.ok || json.success === false) {
-                throw new Error(json.error || "Mazanie zlyhalo");
-            }
-
-            alert("Platba bola vymazaná.");
-
-        } catch (err) {
-            console.error("Chyba pri mazaní platby:", err);
-            alert("Nepodarilo sa vymazať platbu.");
-        }
-    }
 
 
     return (
@@ -181,17 +181,17 @@ export default function PaymentSettingsPage() {
                                 />
                                 {loading && <p>Načítavam...</p>}
                                 {error && <p className="govuk-error-message">{error}</p>}
-                                {searchTerm && filteredParents.length > 0 && (
+                                {searchTerm && filteredChildren.length > 0 && (
                                     <div className="parent-suggestions">
                                         <ul className="govuk-list">
-                                            {filteredParents.map((parent) => (
-                                                <li key={parent.id}>
+                                            {filteredChildren.map((child) => (
+                                                <li key={child.id}>
                                                     <button
                                                         type="button"
                                                         className="govuk-link"
-                                                        onClick={() => handleSelectParent(parent)}
+                                                        onClick={() => handleSelectChild(child)}
                                                     >
-                                                        {parent.firstName} {parent.lastName}
+                                                        {child.firstName} {child.lastName}
                                                     </button>
                                                 </li>
                                             ))}
@@ -200,21 +200,49 @@ export default function PaymentSettingsPage() {
                                 )}
                             </div>
 
-                            {selectedParent && (
+                            {selectedChild && (
                                 <div className="govuk-form-group">
-                                    <h3>Dieťa vybrané: {selectedParent.firstName} {selectedParent.lastName}</h3>
-                                    <label className="govuk-label" htmlFor="payment-amount">
-                                        Zadajte sumu platby
-                                    </label>
-                                    <div className="payment-amount-row">
-                                    <input
-                                        className="govuk-input govuk-!-width-one-third"
-                                        id="payment-amount"
-                                        type="number"
-                                        step="0.01"
-                                        value={paymentAmount}
-                                        onChange={(e) => setPaymentAmount(Number(e.target.value))}
-                                    />
+                                    <h3 className="govuk-heading-m">
+                                        Dieťa vybrané: {selectedChild.firstName}{" "}
+                                        {selectedChild.lastName}
+                                    </h3>
+
+                                    <div className="govuk-form-group">
+                                        <label
+                                            className="govuk-label"
+                                            htmlFor="payment-amount"
+                                        >
+                                            Zadajte sumu platby
+                                        </label>
+                                        <input
+                                            className="govuk-input govuk-!-width-one-third"
+                                            id="payment-amount"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={paymentAmount}
+                                            onChange={(e) => setPaymentAmount(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="govuk-form-group">
+                                        <label
+                                            className="govuk-label"
+                                            htmlFor="payment-date"
+                                        >
+                                            Dátum platby
+                                        </label>
+                                        <input
+                                            className="govuk-input govuk-!-width-one-third"
+                                            id="payment-date"
+                                            type="date"
+                                            value={paymentDate}
+                                            onChange={(e) => setPaymentDate(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+
                                     <button
                                         type="button"
                                         className="govuk-button"
@@ -222,7 +250,6 @@ export default function PaymentSettingsPage() {
                                     >
                                         Uložiť platbu
                                     </button>
-                                    </div>
                                 </div>
                             )}
                         </main>

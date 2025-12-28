@@ -454,4 +454,9 @@ a {
     margin-bottom: 0;
 }
 
+.payments .govuk-table__header {
+    text-align: left;
+}
+
+
 
