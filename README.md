@@ -113,6 +113,12 @@ for database management. Follow these steps to set it up locally:
       npm run seed
     ```
    
+# Face recognition
+
+Container for Python microservice was created together with database. Face recognition is automatically implemented in photo upload.
+
+We use InsightFace - open source toolbox for face recognition and theirs buffalo-l model.
+   
 
 # Learn More
 

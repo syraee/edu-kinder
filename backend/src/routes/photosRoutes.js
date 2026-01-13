@@ -20,7 +20,6 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + path.extname(file.originalname));
     }
 });
-
 const uploadDisk = multer({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per file
@@ -46,33 +45,16 @@ const uploadMemory = multer({
     }
 });
 
-function cosineSimilarity(a, b) {
-    let dot = 0, na = 0, nb = 0;
-    for (let i = 0; i < a.length; i++) {
-        dot += a[i] * b[i];
-        na += a[i] * a[i];
-        nb += b[i] * b[i];
-    }
-    if (na === 0 || nb === 0) return 0;
-    return dot / (Math.sqrt(na) * Math.sqrt(nb));
-}
-
-async function getFaceCount(filePath){
-    const form = new FormData;
-    form.append('photo', fs.createReadStream(filePath));
-
-    const response = await axios.post('http://localhost:8000/count_faces', form, {
-        headers: form.getHeaders(),
-        timeout: 10000
-    });
-
-    return response.data.faceCount;
-}
-
-async function getAllFaces(filePath){
+async function getAllFaces(filePath, classIds){
     const children = await prisma.child.findMany({
+        where: {
+            groupId: {
+                in: classIds
+            }
+        },
         include: {
-            FaceEmbedding: true
+            FaceEmbedding: true,
+            group: true
         }
     });
 
@@ -185,11 +167,10 @@ router.post('/', uploadDisk.array('photos', 50), async (req, res) => {
             .webp({ quality: 75 })
             .toFile(finalPath);
 
-        const faces = await getAllFaces(file.path);
+        const faces = await getAllFaces(file.path, classIdsArray);
 
         fs.unlinkSync(file.path);
 
-        console.log(faces)
         for (let j = 0; j < faces.length; j++) {
             console.log(`Počet tvárí na fotke ${file.originalname}: ${faces[j]}`);
         }
@@ -204,11 +185,12 @@ router.post('/', uploadDisk.array('photos', 50), async (req, res) => {
             }
         });
 
+
         processedFiles.push({
             originalName: file.originalname,
             savedAs: finalName,
             url: finalPath,
-            dbId: photo.id
+            faces: faces
         });
     }
 
@@ -219,6 +201,8 @@ router.post('/', uploadDisk.array('photos', 50), async (req, res) => {
     });
 });
 
+
+// POST /embedding
 router.post("/embedding", uploadMemory.array("photos", 5), async (req, res) => {
     const { childId } = req.body;
     if (!childId) return res.status(400).json({ message: "childId is required" });
@@ -263,14 +247,45 @@ router.post("/embedding", uploadMemory.array("photos", 5), async (req, res) => {
     });
 });
 
-router.post("/recognize", uploadMemory.single("photo"), async (req, res) => {
-    try {
+// GET /photos/event/:eventId
+router.get('/event/:eventId', async (req, res) => {
+    const eventId = parseInt(req.params.eventId);
+    const photos = await prisma.photo.findMany({
+        where: { eventId },
+        include: { PhotoOnClass: { include: { class: true } } },
+        orderBy: { createdAt: 'desc' }
+    });
 
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Nepodarilo sa rozpoznať tváre" });
-    }
+    res.json({ count: photos.length, photos });
 });
 
+// GET /photos/class/:classId
+router.get('/class/:classId', async (req, res) => {
+    const classId = parseInt(req.params.classId);
+    const photos = await prisma.photo.findMany({
+        where: { PhotoOnClass: { some: { classId } } },
+        include: { PhotoOnClass: { include: { class: true } }, event: true },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({ count: photos.length, photos });
+});
+
+// GET /photos/:id
+router.get('/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    const photo = await prisma.photo.findUnique({
+        where: { id },
+        include: {
+            event: true,
+            PhotoOnClass: { include: { class: true } },
+            FaceOnPhoto: { include: { child: true } }
+        }
+    });
+
+    if (!photo) return res.status(404).json({ message: 'Photo not found' });
+
+    res.json(photo);
+});
 
 module.exports = router;
