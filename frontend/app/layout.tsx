@@ -1,8 +1,9 @@
 import "./styles/globals.css";
 import "./styles/application.scss";
 
+import IdskInit from "./components/IdskInit";
+import { ToastProvider } from "./components/ToastProvider";
 
-import IdskInit from './components/IdskInit';
 export const metadata = {
   title: "EduKinder",
   description: "kindergarden",
@@ -11,13 +12,14 @@ export const metadata = {
   },
 };
 
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="sk">
       <body>
-        <IdskInit />
-        {children}
+        <ToastProvider>
+          <IdskInit />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
