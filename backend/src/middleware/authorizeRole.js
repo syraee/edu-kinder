@@ -9,9 +9,21 @@ function authorize(allowedRoles = []) {
                 return next();
             }
 
-            console.log(req.user.role.type);
+            // Check if role exists
+            if (!req.user.role) {
+                console.error("User has no role:", req.user);
+                return res.status(403).json({ error: "Používateľ nemá priradenú rolu." });
+            }
 
-            if (!allowedRoles.includes(req.user.role.type)) {
+            const userRoleType = req.user.role.type;
+            console.log("User role type:", userRoleType, "Allowed roles:", allowedRoles);
+
+            // Case-insensitive comparison
+            const userRoleUpper = String(userRoleType || "").toUpperCase();
+            const allowedRolesUpper = allowedRoles.map(r => String(r).toUpperCase());
+
+            if (!allowedRolesUpper.includes(userRoleUpper)) {
+                console.error(`Access denied: User role '${userRoleType}' not in allowed roles:`, allowedRoles);
                 return res
                     .status(403)
                     .json({ error: "Nemáte oprávnenie pre túto akciu." });

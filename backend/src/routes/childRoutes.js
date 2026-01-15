@@ -50,6 +50,7 @@ router.get("/mine", authenticate, async (req, res, next) => {
       id: g.child.id,
       firstName: g.child.firstName,
       lastName: g.child.lastName,
+      groupId: g.child.groupId,
     }));
 
     return res.json({ success: true, data: children });
