@@ -21,6 +21,7 @@ model User {
   roleId    Int?
   email     String    @unique
   active    Boolean
+  internal  Boolean @default(false)
   phone     String?
   createdAt DateTime  @default(now())
 
@@ -28,6 +29,9 @@ model User {
   children  ChildGuardian[]
   loginTokens LoginToken[]
   sessions  Session[]
+  changeLogs      ChangeLog[]
+  sentMessages     Message[] @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageRecipient")
 }
 
 model Role {
@@ -48,6 +52,8 @@ model Child {
 
   guardians ChildGuardian[]
   mealAttendances MealAttendance[]
+  mealMonthlyStatement MealMonthlyStatement[]
+  payments        Payment[]
 }
 
 model ChildGuardian {
@@ -99,4 +105,114 @@ model MealAttendance {
   updatedAt DateTime @updatedAt
   @@unique([childId, date])
   @@index([date])
+}
+
+model PaymentSettings {
+  id           Int      @id @default(autoincrement())
+
+  breakfastFee   Decimal @db.Decimal(10, 2)
+  lunchFee       Decimal @db.Decimal(10, 2)
+  snackFee       Decimal @db.Decimal(10, 2)
+  tuitionFee     Decimal @db.Decimal(10, 2)
+  tuitionFeeExt     Decimal @db.Decimal(10, 2)
+
+  mealsIban    String
+  tuitionIban  String
+
+  mealsVarSym   String
+  tuitionVarSym  String
+
+
+  validFrom    DateTime @default(now())
+  validTo      DateTime?
+
+  createdAt    DateTime @default(now())
+  mealMonthlyStatement MealMonthlyStatement[]
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId    Int
+  amount    Decimal
+  feeType   FeeType   // STRAVA
+  paidAt    DateTime
+}
+
+enum FeeType {
+  SKOLNE
+  STRAVA
+}
+
+model ChangeLog {
+  id            Int      @id @default(autoincrement())
+  changedAt     DateTime @default(now())
+  userId        Int
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  oldValues     String
+  newValues     String
+  description   String
+
+  @@index([userId, changedAt])
+}
+
+enum MealStatementStatus {
+  UNPAID
+  PAID
+  PARTIAL
+  CANCELED
+}
+
+model MealMonthlyStatement {
+  id           Int       @id @default(autoincrement())
+
+  child        Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId      Int
+
+  month        DateTime
+
+  plannedDays  Int
+
+  breakfastCount Int     @default(0)
+  lunchCount     Int     @default(0)
+  snackCount     Int     @default(0)
+
+  mealsAmount    Decimal @db.Decimal(10, 2)
+  carryOverIn    Decimal @db.Decimal(10, 2)
+  totalToPay     Decimal @db.Decimal(10, 2)
+  carryOverOut   Decimal @db.Decimal(10, 2)
+
+  status         MealStatementStatus @default(UNPAID)
+  paymentSettings PaymentSettings? @relation(fields: [paymentSettingsId], references: [id])
+  paymentSettingsId Int?
+  qrPayload      String?
+
+  generatedAt    DateTime @default(now())
+  paidAt         DateTime?
+
+  @@unique([childId, month])
+  @@index([childId, month])
+}
+
+model Message {
+  id           Int      @id @default(autoincrement())
+  senderId     Int
+  recipientId  Int
+  value        String
+  createdAt    DateTime @default(now())
+
+  notified     Boolean  @default(false)
+  readAt       DateTime?
+
+  isAttachment   Boolean @default(false)
+  attachmentName String?
+  attachmentMime String?
+  attachmentSize Int?
+
+  sender       User     @relation("MessageSender", fields: [senderId], references: [id])
+  recipient    User     @relation("MessageRecipient", fields: [recipientId], references: [id])
+
+  @@index([senderId, createdAt])
+  @@index([recipientId, createdAt])
+  @@index([senderId, recipientId, createdAt])
 }

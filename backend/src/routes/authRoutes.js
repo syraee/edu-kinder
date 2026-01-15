@@ -168,23 +168,24 @@ router.post('/register/complete', async (req, res) => {
 });
 
 router.get("/me", authenticate, (req, res) => {
-    try {
-        const u = req.user;
-        if (!u?.id) return res.status(401).json({user: null});
 
-        const roleText =
-            typeof u.role === "string"
-                ? u.role
-                : u.role?.name || u.role?.code || u.role?.type || u.roleId || "";
+  try {
+    const u = req.user;
+    if (!u?.id) return res.status(401).json({ user: null });
 
-        res.setHeader("Cache-Control", "no-store");
-        return res.json({
-            user: {id: u.id, email: u.email, role: roleText},
-        });
-    } catch (err) {
-        console.error("GET /api/auth/me error:", err);
-        return res.status(500).json({user: null, error: "Internal error"});
-    }
+    const roleText =
+      typeof u.role === "string"
+        ? u.role
+        : u.role?.name || u.role?.code || u.role?.type || u.roleId || "";
+
+    res.setHeader("Cache-Control", "no-store");
+    return res.json({
+      user: { id: u.id, firstName: u.firstName, lastName: u.lastName, email: u.email, role: roleText },
+    });
+  } catch (err) {
+    console.error("GET /api/auth/me error:", err);
+    return res.status(500).json({ user: null, error: "Internal error" });
+  }
 });
 
 router.post("/logout", (req, res) => {
