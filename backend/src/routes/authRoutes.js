@@ -9,10 +9,10 @@ const router = express.Router();
 
 
 router.post("/register/request", authenticate, authorize(["Admin"]), async (req, res) => {
-    const { emails } = req.body;
+    const {emails} = req.body;
 
     if (!emails || !Array.isArray(emails) || emails.length === 0) {
-        return res.status(400).json({ error: "Zoznam emailov je prázdny alebo neplatný." });
+        return res.status(400).json({error: "Zoznam emailov je prázdny alebo neplatný."});
     }
 
     const results = {
@@ -24,11 +24,11 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
     for (const email of emails) {
         try {
             const existing = await prisma.user.findUnique({
-                where: { email }
+                where: {email}
             });
 
             if (!existing) {
-                results.skipped.push({ email, reason: "Používateľ neexistuje" });
+                results.skipped.push({email, reason: "Používateľ neexistuje"});
                 continue;
             }
 
@@ -48,7 +48,7 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
             //     }
             // });
 
-            const token = generateToken(existing.id, email, existing.roleId, "registration", "3d" );
+            const token = generateToken(existing.id, email, existing.roleId, "registration", "3d");
 
             await sendInvitationMail(email, token);
             results.sent.push(email);
@@ -75,30 +75,30 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
 
 router.post('/register/prefill', async (req, res) => {
     try {
-        const { token } = req.body || {};
-        if (!token) return res.status(400).json({ error: 'Chýba token.' });
+        const {token} = req.body || {};
+        if (!token) return res.status(400).json({error: 'Chýba token.'});
 
         const result = await verifyToken(token, 'registration');
-        if (!result) return res.status(401).json({ error: 'Neplatný alebo expirovaný token.' });
+        if (!result) return res.status(401).json({error: 'Neplatný alebo expirovaný token.'});
 
-        const { user } = result;
+        const {user} = result;
 
         if (user.active) {
             return res
                 .status(409)
-                .json({ error: 'Registrácia je už dokončená. Môžete sa prihlásiť.', redirectUrl: '/login' });
+                .json({error: 'Registrácia je už dokončená. Môžete sa prihlásiť.', redirectUrl: '/login'});
         }
 
         const links = await prisma.childGuardian.findMany({
-            where: { userId: user.id },
-            include: { child: true },
-            orderBy: { id: 'asc' },
+            where: {userId: user.id},
+            include: {child: true},
+            orderBy: {id: 'asc'},
         });
 
         const children = links.map((l) => ({
-            id:        l.child.id,
+            id: l.child.id,
             firstName: l.child.firstName || '',
-            lastName:  l.child.lastName  || '',
+            lastName: l.child.lastName || '',
             birthDate: l.child.birthDate ? l.child.birthDate.toISOString().slice(0, 10) : '',
 
         }));
@@ -106,51 +106,51 @@ router.post('/register/prefill', async (req, res) => {
         return res.json({
             parent: {
                 firstName: user.firstName || '',
-                lastName:  user.lastName  || '',
-                email:     user.email     || '',
-                phone:     user.phone     || '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                phone: user.phone || '',
             },
             children,
         });
     } catch (err) {
         console.error('prefill error:', err);
-        return res.status(500).json({ error: 'Server zlyhal pri načítaní údajov.' });
+        return res.status(500).json({error: 'Server zlyhal pri načítaní údajov.'});
     }
 });
 
 router.post('/register/complete', async (req, res) => {
     try {
-        const { token, parent, childIds } = req.body || {};
-        if (!token)  return res.status(400).json({ error: 'Chýba token.' });
-        if (!parent) return res.status(400).json({ error: 'Chýbajú údaje rodiča.' });
+        const {token, parent, childIds} = req.body || {};
+        if (!token) return res.status(400).json({error: 'Chýba token.'});
+        if (!parent) return res.status(400).json({error: 'Chýbajú údaje rodiča.'});
 
         const result = await verifyToken(token, 'registration');
-        if (!result) return res.status(401).json({ error: 'Neplatný alebo expirovaný token.' });
+        if (!result) return res.status(401).json({error: 'Neplatný alebo expirovaný token.'});
 
-        const { user } = result;
+        const {user} = result;
 
 
         if (Array.isArray(childIds) && childIds.length > 0) {
             const ids = childIds.map(Number);
             const guardians = await prisma.childGuardian.findMany({
-                where: { userId: user.id, childId: { in: ids } },
-                select: { childId: true },
+                where: {userId: user.id, childId: {in: ids}},
+                select: {childId: true},
             });
             const owned = new Set(guardians.map(g => g.childId));
             const allMatch = ids.every(id => owned.has(id));
-            if (!allMatch) return res.status(403).json({ error: 'Zoznam detí nezodpovedá priradeným deťom.' });
+            if (!allMatch) return res.status(403).json({error: 'Zoznam detí nezodpovedá priradeným deťom.'});
         }
 
 
         const firstName = String(parent.firstName || '').trim();
-        const lastName  = String(parent.lastName  || '').trim();
-        const email     = String(parent.email     || '').trim().toLowerCase();
-        const phone     = String(parent.phone     || '').trim();
+        const lastName = String(parent.lastName || '').trim();
+        const email = String(parent.email || '').trim().toLowerCase();
+        const phone = String(parent.phone || '').trim();
 
 
         await prisma.user.update({
-            where: { id: user.id },
-            data:  {
+            where: {id: user.id},
+            data: {
                 firstName,
                 lastName,
                 email,
@@ -159,15 +159,16 @@ router.post('/register/complete', async (req, res) => {
             },
         });
 
-        return res.json({ message: 'Registrácia dokončená a účet aktivovaný.' });
+        return res.json({message: 'Registrácia dokončená a účet aktivovaný.'});
 
     } catch (err) {
         console.error('registration/complete error:', err);
-        return res.status(500).json({ error: 'Server zlyhal pri ukladaní registrácie.' });
+        return res.status(500).json({error: 'Server zlyhal pri ukladaní registrácie.'});
     }
 });
 
 router.get("/me", authenticate, (req, res) => {
+
   try {
     const u = req.user;
     if (!u?.id) return res.status(401).json({ user: null });
@@ -188,40 +189,50 @@ router.get("/me", authenticate, (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  res.clearCookie("accessToken", {
-    path: "/",
-    sameSite: "lax",
-    secure: false,
-    httpOnly: true,
-  });
-  res.clearCookie("refreshToken");
-  return res.json({ ok: true });
+    const baseOptions = {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+    };
+
+
+    res.cookie("accessToken", "", {
+        ...baseOptions,
+        maxAge: 0,
+    });
+
+    res.cookie("refreshToken", "", {
+        ...baseOptions,
+        maxAge: 0,
+    });
+
+    return res.json({ok: true});
 });
 
 
-
 router.post("/login/request", async (req, res) => {
-    const { email} = req.body;
+    const {email} = req.body;
     console.log(email);
-    if (!email) return res.status(400).json({ error: "Email je povinný" });
+    if (!email) return res.status(400).json({error: "Email je povinný"});
 
     const loginUser = await prisma.user.findUnique({
-        where: { email }
+        where: {email}
     });
 
-    if (!loginUser) return res.status(404).json({ error: "Používateľ neexistuje" });
+    if (!loginUser) return res.status(404).json({error: "Používateľ neexistuje"});
 
-    const token = generateToken( loginUser.id, email, loginUser.roleId, "login", "15m");
+    const token = generateToken(loginUser.id, email, loginUser.roleId, "login", "15m");
 
     const link = `http://localhost:5000/api/auth/login/verify?token=${token}`;
 
     await sendLoginMail(email, link);
 
-    return res.json({ message: "Na váš e-mail bol odoslaný prihlasovací odkaz." });
+    return res.json({message: "Na váš e-mail bol odoslaný prihlasovací odkaz."});
 });
 
 router.post("/login/verify", async (req, res) => {
-    const { token } = req.body;
+    const {token} = req.body;
 
     try {
         const {decoded, user} = await verifyToken(token, "login")
@@ -255,31 +266,31 @@ router.post("/login/verify", async (req, res) => {
         return res.redirect(303, "http://localhost:3000/");
     } catch (err) {
         console.error(err);
-        return res.status(401).json({ error: "Neplatný alebo expirovaný token." });
+        return res.status(401).json({error: "Neplatný alebo expirovaný token."});
     }
 });
 
 router.get("/register/verify", async (req, res) => {
     try {
-        const { token } = req.query;
+        const {token} = req.query;
         const decoded = verify(token, process.env.JWT_SECRET);
 
         if (decoded.type !== "registration") {
-            return res.status(400).json({ error: "Neplatný typ tokenu" });
+            return res.status(400).json({error: "Neplatný typ tokenu"});
         }
 
-        res.json({ message: "Účet bol úspešne aktivovaný!" });
+        res.json({message: "Účet bol úspešne aktivovaný!"});
     } catch (err) {
-        res.status(400).json({ error: "Neplatný alebo expirovaný token" });
+        res.status(400).json({error: "Neplatný alebo expirovaný token"});
     }
 });
 
 router.get("/login/verify", async (req, res) => {
     try {
-        const { token } = req.query;
+        const {token} = req.query;
         if (!token) return res.status(400).send("Missing token");
 
-        const { decoded, user } = await verifyToken(String(token), "login");
+        const {decoded, user} = await verifyToken(String(token), "login");
 
         const accessToken = generateToken(user.id, user.email, user.role, "access", "2h");
         const refreshToken = generateToken(user.id, user.email, user.role, "refresh", "7d");
@@ -290,6 +301,7 @@ router.get("/login/verify", async (req, res) => {
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: "/",
         });
 
         res.cookie("accessToken", accessToken, {
@@ -297,6 +309,7 @@ router.get("/login/verify", async (req, res) => {
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
             maxAge: 2 * 60 * 60 * 1000,
+            path: "/",
         });
 
         return res.redirect(303, "http://localhost:3000/");
@@ -308,12 +321,12 @@ router.get("/login/verify", async (req, res) => {
 
 router.post("/refresh", async (req, res) => {
     try {
-        const { refreshToken } = req.cookies;
+        const {refreshToken} = req.cookies;
         if (!refreshToken) {
-            return res.status(401).json({ error: "Missing refresh token" });
+            return res.status(401).json({error: "Missing refresh token"});
         }
 
-        const { decoded, user } = await verifyToken(refreshToken, "refresh");
+        const {decoded, user} = await verifyToken(refreshToken, "refresh");
 
         const newAccessToken = generateToken(
             user.id,
@@ -330,12 +343,12 @@ router.post("/refresh", async (req, res) => {
             maxAge: 2 * 60 * 60 * 1000,
         });
 
-        return res.json({ success: true });
+        return res.json({success: true});
     } catch (err) {
         console.error("refresh failed:", err);
         res.clearCookie("accessToken");
         res.clearCookie("refreshToken");
-        return res.status(401).json({ error: "Invalid refresh token" });
+        return res.status(401).json({error: "Invalid refresh token"});
     }
 });
 module.exports = router;
