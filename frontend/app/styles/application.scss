@@ -1,5 +1,6 @@
 $govuk-assets-path: "/idsk-assets/";
-@import "@id-sk/frontend/dist/govuk/all";
+@import "../../node_modules/@id-sk/frontend/dist/govuk/all";
+
 @import "./menu.scss";
 
 .idsk-docs__row {

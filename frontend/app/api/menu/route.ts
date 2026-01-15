@@ -15,9 +15,8 @@ type ScrapedPdf = {
 // Vygeneruje kandidátov URL pre aktuálny týždeň na základe dátumových vzorov
 function generateWeekUrlCandidates(date: Date): UrlCandidate[] {
   const candidates: UrlCandidate[] = [];
-  const baseUrl = "https://www.upjs.sk/app/uploads/sites/26";
+  const baseUrl = "https://upjs.sk/app/uploads/sites/26"; // všimni si: upjs.sk (bez www)
 
-  // Zisti pondelok v aktuálnom týždni
   const dayOfWeek = date.getDay();
   const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
   const monday = new Date(date);
@@ -30,29 +29,45 @@ function generateWeekUrlCandidates(date: Date): UrlCandidate[] {
     const friday = new Date(weekMonday);
     friday.setDate(weekMonday.getDate() + 4);
 
-    // Zobrazenie dátumu ako DD.MM.RRRR
     const mondayStr = formatDate(weekMonday);
     const fridayStr = formatDate(friday);
 
-    // Skrátený formát v názve súboru: DD-DD.MM.RRRR
-    const shortFormat = `${weekMonday.getDate()}-${friday.getDate()}.${String(
-      friday.getMonth() + 1
-    ).padStart(2, "0")}.${friday.getFullYear()}`;
-
     const year = weekMonday.getFullYear();
-    const month = String(weekMonday.getMonth() + 1).padStart(2, "0");
+    const month2 = String(weekMonday.getMonth() + 1).padStart(2, "0");
+    const monthNo0 = String(weekMonday.getMonth() + 1);
 
-    // Štruktúrovaná cesta: /rok/mesiac/názov.pdf
+    const yy = String(year).slice(-2);
+
+    const d1 = String(weekMonday.getDate());
+    const d2 = String(friday.getDate());
+
+    // ✅ REÁLNY FORMÁT (podľa tvojho screenshotu)
+    // 12.1.-16.1.26.pdf
+    const realFormat = `${d1}.${monthNo0}.-${d2}.${monthNo0}.${yy}`;
+
+    // tvoje staré formáty (ponecháme ako fallback)
+    const oldA = `${weekMonday.getDate()}-${friday.getDate()}.${month2}.${year}`;
+    const oldB = `${String(weekMonday.getDate()).padStart(2, "0")}-${String(friday.getDate()).padStart(2, "0")}.${month2}.${year}`;
+
+    const label = `${mondayStr} - ${fridayStr}`;
+
+    // reálny formát: s /rok/mesiac/
     candidates.push({
-      url: `${baseUrl}/${year}/${month}/${shortFormat}.pdf`,
-      label: `${mondayStr} - ${fridayStr}`,
+      url: `${baseUrl}/${year}/${month2}/${realFormat}.pdf`,
+      label,
     });
 
-    // Alternatíva: bez zložky rok/mesiac
+    // reálny formát: bez /rok/mesiac/ (keby náhodou)
     candidates.push({
-      url: `${baseUrl}/${shortFormat}.pdf`,
-      label: `${mondayStr} - ${fridayStr}`,
+      url: `${baseUrl}/${realFormat}.pdf`,
+      label,
     });
+
+    // staré fallbacky
+    candidates.push({ url: `${baseUrl}/${year}/${month2}/${oldA}.pdf`, label });
+    candidates.push({ url: `${baseUrl}/${year}/${month2}/${oldB}.pdf`, label });
+    candidates.push({ url: `${baseUrl}/${oldA}.pdf`, label });
+    candidates.push({ url: `${baseUrl}/${oldB}.pdf`, label });
   }
 
   return candidates;
@@ -72,7 +87,7 @@ export async function GET(req: Request) {
   // Voliteľný zdroj pre scraping (?source=...), inak predvolená stránka škôlky
   const sourceUrl =
     searchParams.get("source") ||
-    "https://www.upjs.sk/materska-skola-upejesko/stravovanie/";
+    "https://upjs.sk/pracoviska/materska-skola/rodicia/jedalny-listok/";
 
   try {
     let pdfUrl: string | null = null;

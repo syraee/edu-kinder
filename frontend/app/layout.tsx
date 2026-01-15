@@ -1,6 +1,6 @@
 import "./styles/globals.css";
 import "./styles/application.scss";
-
+import "./styles/menu.scss";
 import IdskInit from "./components/IdskInit";
 import { ToastProvider } from "./components/ToastProvider";
 

@@ -29,13 +29,12 @@ model User {
   children  ChildGuardian[]
   loginTokens LoginToken[]
   sessions  Session[]
-<<<<<<< HEAD
   attendanceLogs AttendanceLog[]
-=======
+
   changeLogs      ChangeLog[]
   sentMessages     Message[] @relation("MessageSender")
   receivedMessages Message[] @relation("MessageRecipient")
->>>>>>> c9367f2be9179e3db6247c19b335c216ac0396c3
+
 }
 
 model Role {
@@ -56,13 +55,13 @@ model Child {
 
   guardians ChildGuardian[]
   mealAttendances MealAttendance[]
-<<<<<<< HEAD
+
   attendances    Attendance[]
   attendanceLogs AttendanceLog[]
-=======
+
   mealMonthlyStatement MealMonthlyStatement[]
   payments        Payment[]
->>>>>>> c9367f2be9179e3db6247c19b335c216ac0396c3
+
 }
 
 model ChildGuardian {
