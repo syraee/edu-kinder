@@ -474,6 +474,28 @@ a {
     outline-offset: 2px;
 }
 
+.chipsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.chip {
+    border: 1px solid #d8dde0;
+    background: #f3f2f1;
+    border-radius: 999px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.chipX {
+    font-weight: 800;
+    margin-left: 6px;
+}
+
 
 .pageRow {
     display: flex;
@@ -847,6 +869,84 @@ a {
     font-size: 13px;
     opacity: 0.7;
 }
+
+.userDropdown {
+    margin-top: 6px;
+    border: 1px solid #d8dde0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.userDropdownItem {
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.userDropdownItem:hover {
+    background: #f3f2f1;
+}
+
+.userDropdownName {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.userDropdownEmail {
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.userDropdownEmpty {
+    padding: 10px 12px;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.month-nav-wrap{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.month-nav{
+    display: inline-grid;
+    grid-template-columns: 36px auto 36px;
+    align-items: center;
+    gap: 12px;
+    width: fit-content;
+}
+
+.month-nav .govuk-button { margin: 0; }
+
+.month-nav .btn-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0 !important;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+    box-sizing: border-box;
+    font-size: 18px;
+}
+
+.month-nav .month-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
 
 
 

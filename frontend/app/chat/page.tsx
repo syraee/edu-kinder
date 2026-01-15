@@ -22,6 +22,11 @@ type ThreadMsg = {
     value: string;
     createdAt: string;
     readAt: string | null;
+
+    isAttachment: boolean;
+    attachmentName: string | null;
+    attachmentMime: string | null;
+    attachmentSize: number | null;
 };
 
 type UserPick = { id: number; name: string; email: string };
@@ -95,6 +100,16 @@ const fmtDateTime = (iso: string) =>
         minute: "2-digit",
     }).format(new Date(iso));
 
+function toDownloadUrl(pathOrUrl: string): string {
+    const p = pathOrUrl.trim();
+    if (!p) return "#";
+    if (p.startsWith("http://") || p.startsWith("https://")) return p;
+    if (p.startsWith("/")) return `${API_BASE}${p}`;
+    return `${API_BASE}/${p}`;
+}
+
+
+
 export default function ChatPage() {
     const [me, setMe] = useState<Me>(null);
     const [convos, setConvos] = useState<Conversation[]>([]);
@@ -103,18 +118,52 @@ export default function ChatPage() {
     const [err, setErr] = useState<string | null>(null);
 
     const [draft, setDraft] = useState<string>("");
+    const [file, setFile] = useState<File | null>(null);
+
 
     const [newOpen, setNewOpen] = useState(false);
     const [userQ, setUserQ] = useState("");
     const [userHits, setUserHits] = useState<UserPick[]>([]);
     const [userLoading, setUserLoading] = useState(false);
+    const [userOpen, setUserOpen] = useState(false);
+
+    const [selectedUsers, setSelectedUsers] = useState<UserPick[]>([]);
+    const [bulkText, setBulkText] = useState("");
+
+    const qTrim = userQ.trim();
+    const showDropdown = userOpen && qTrim.length >= 2 && (userLoading || userHits.length > 0);
 
     const threadRef = useRef<HTMLDivElement | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const activePartner = useMemo(
         () => convos.find((c) => c.partnerId === activePartnerId) ?? null,
         [convos, activePartnerId]
     );
+    async function deleteConversation(partnerId: number) {
+        if (!window.confirm("Naozaj chceš vymazať túto konverzáciu?")) return;
+
+        const res = await fetch(`${API_BASE}/api/chat/conversation/${partnerId}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+
+        const raw: unknown = await res.json().catch(() => null);
+        const parsed = parseApiResponse<unknown>(raw);
+
+        if (!res.ok || parsed.success === false) {
+            throw new Error(parsed.success === false ? parsed.error ?? "Delete failed" : "Delete failed");
+        }
+
+
+        await fetchConversations();
+
+
+        setThread((prev) => (activePartnerId === partnerId ? [] : prev));
+        setActivePartnerId((prev) => (prev === partnerId ? null : prev));
+    }
+
+
 
     async function fetchMe() {
         const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include", cache: "no-store" });
@@ -183,6 +232,11 @@ export default function ChatPage() {
                 value: typeof x["value"] === "string" ? x["value"] : "",
                 createdAt: typeof x["createdAt"] === "string" ? x["createdAt"] : String(x["createdAt"] ?? ""),
                 readAt: typeof x["readAt"] === "string" ? x["readAt"] : null,
+
+                isAttachment: typeof x["isAttachment"] === "boolean" ? x["isAttachment"] : false,
+                attachmentName: typeof x["attachmentName"] === "string" ? x["attachmentName"] : null,
+                attachmentMime: typeof x["attachmentMime"] === "string" ? x["attachmentMime"] : null,
+                attachmentSize: typeof x["attachmentSize"] === "number" ? x["attachmentSize"] : null,
             }))
             .filter((m) => m.id !== -1);
 
@@ -196,33 +250,99 @@ export default function ChatPage() {
         fetchConversations().catch(() => {});
     }
 
+    function addSelected(u: UserPick) {
+        setSelectedUsers((prev) => (prev.some((x) => x.id === u.id) ? prev : [...prev, u]));
+    }
+
+    function removeSelected(id: number) {
+        setSelectedUsers((prev) => prev.filter((x) => x.id !== id));
+    }
+
+    async function sendBulk() {
+        const text = bulkText.trim();
+        if (!text || selectedUsers.length === 0) return;
+
+        const recipientIds = selectedUsers.map((u) => u.id);
+
+        const res = await fetch(`${API_BASE}/api/chat/send-bulk`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipientIds, value: text }),
+        });
+
+        const raw: unknown = await res.json();
+        const parsed = parseApiResponse<{ sentTo: number }>(raw);
+
+        if (!res.ok || parsed.success === false) {
+            throw new Error(parsed.success === false ? parsed.error ?? "Failed" : "Failed");
+        }
+
+        setNewOpen(false);
+        setSelectedUsers([]);
+        setBulkText("");
+        setUserQ("");
+        setUserHits([]);
+        setUserOpen(false);
+
+        await fetchConversations();
+    }
+
     async function sendMessage(e?: FormEvent) {
         if (e) e.preventDefault();
+
         const partnerId = activePartnerId;
         const myId = me?.id ?? null;
-        const text = draft.trim();
 
-        if (!partnerId || !myId || !text) return;
+        if (!partnerId || !myId) return;
+
+        const text = draft.trim();
+        const hasFile = file != null;
+
+        if (!hasFile && !text) return;
 
         const optimistic: ThreadMsg = {
             id: -Date.now(),
             senderId: myId,
             recipientId: partnerId,
-            value: text,
+            value: hasFile ? (file?.name ?? "Príloha") : text,
             createdAt: new Date().toISOString(),
             readAt: null,
+
+            isAttachment: hasFile,
+            attachmentName: hasFile ? (file?.name ?? null) : null,
+            attachmentMime: hasFile ? (file?.type || null) : null,
+            attachmentSize: hasFile ? (file?.size ?? null) : null,
         };
 
-        setDraft("");
         setThread((prev) => [...prev, optimistic]);
+        setDraft("");
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
 
         try {
-            const res = await fetch(`${API_BASE}/api/chat/send`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ recipientId: partnerId, value: text }),
-            });
+            let res: Response;
+
+            if (hasFile) {
+
+                const fd = new FormData();
+                fd.append("recipientId", String(partnerId));
+                if (text) fd.append("message", text);
+
+                res = await fetch(`${API_BASE}/api/chat/send`, {
+                    method: "POST",
+                    credentials: "include",
+                    body: fd,
+                });
+            } else {
+                // json
+                res = await fetch(`${API_BASE}/api/chat/send`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ recipientId: partnerId, value: text }),
+                });
+            }
 
             const raw: unknown = await res.json();
             const parsed = parseApiResponse<unknown>(raw);
@@ -235,16 +355,13 @@ export default function ChatPage() {
             await fetchConversations();
         } catch (errx) {
             setErr(getErrorMessage(errx));
+
             setThread((prev) => prev.filter((m) => m.id !== optimistic.id));
-            setDraft(text);
+
+            if (!hasFile) setDraft(text);
+
         }
     }
-
-    useEffect(() => {
-        const el = threadRef.current;
-        if (!el) return;
-        el.scrollTop = el.scrollHeight;
-    }, [thread]);
 
     useEffect(() => {
         let alive = true;
@@ -273,15 +390,30 @@ export default function ChatPage() {
     }, [convos]);
 
     useEffect(() => {
+        const el = threadRef.current;
+        if (!el) return;
+        el.scrollTop = el.scrollHeight;
+    }, [thread]);
+
+
+    useEffect(() => {
         if (!newOpen) return;
 
         const q = userQ.trim();
+        if (q.length < 2) {
+            setUserHits([]);
+            setUserLoading(false);
+            return;
+        }
+
         const t = window.setTimeout(async () => {
             try {
                 setUserLoading(true);
+
                 const res = await fetch(`${API_BASE}/api/chat/users?q=${encodeURIComponent(q)}`, {
                     credentials: "include",
                 });
+
                 const raw: unknown = await res.json();
                 const parsed = parseApiResponse<unknown>(raw);
 
@@ -289,13 +421,12 @@ export default function ChatPage() {
                     throw new Error(parsed.success === false ? parsed.error ?? "Fetch failed" : "Fetch failed");
                 }
 
-                const data = parsed.data;
-                if (!Array.isArray(data)) {
+                if (!Array.isArray(parsed.data)) {
                     setUserHits([]);
                     return;
                 }
 
-                const safe: UserPick[] = data
+                const safe: UserPick[] = parsed.data
                     .map((x) => (isRecord(x) ? x : null))
                     .filter((x): x is Record<string, unknown> => x !== null)
                     .map((x) => ({
@@ -303,7 +434,8 @@ export default function ChatPage() {
                         name: typeof x["name"] === "string" ? x["name"] : "",
                         email: typeof x["email"] === "string" ? x["email"] : "",
                     }))
-                    .filter((u) => u.id !== -1);
+                    .filter((u) => u.id !== -1)
+                    .filter((u) => (me?.id != null ? u.id !== me.id : true));
 
                 setUserHits(safe);
             } catch (e) {
@@ -314,13 +446,17 @@ export default function ChatPage() {
         }, 250);
 
         return () => window.clearTimeout(t);
-    }, [newOpen, userQ]);
 
-    function startNewWith(userId: number) {
+    }, [newOpen, userQ, me?.id]);
+
+    function closeModal() {
         setNewOpen(false);
         setUserQ("");
         setUserHits([]);
-        openThread(userId).catch((e) => setErr(getErrorMessage(e)));
+        setUserLoading(false);
+        setSelectedUsers([]);
+        setBulkText("");
+        setUserOpen(false);
     }
 
     return (
@@ -392,7 +528,32 @@ export default function ChatPage() {
                                         return (
                                             <div key={m.id} className={`msgRow ${mine ? "msgRowMine" : "msgRowOther"}`}>
                                                 <div className={`bubble ${mine ? "bubbleMine" : ""}`}>
-                                                    <div className="bubbleText">{m.value}</div>
+
+                                                    {!m.isAttachment ? (
+                                                        <div className="bubbleText">{m.value}</div>
+                                                    ) : (
+                                                        <div className="bubbleAttachment">
+                                                            <div className="bubbleAttachmentTitle">
+                                                                Príloha: <b>{m.attachmentName ?? "Súbor"}</b>
+                                                            </div>
+
+                                                            <a
+                                                                className="bubbleAttachmentLink"
+                                                                href={toDownloadUrl(m.value)}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                            >
+                                                                Stiahnuť
+                                                            </a>
+
+                                                            {typeof m.attachmentSize === "number" && (
+                                                                <div className="bubbleAttachmentMeta">
+                                                                    {Math.round(m.attachmentSize / 1024)} KB
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
                                                     <div className="bubbleMeta">{fmtDateTime(m.createdAt)}</div>
                                                 </div>
                                             </div>
@@ -400,17 +561,32 @@ export default function ChatPage() {
                                     })}
                                 </div>
 
+
                                 <form className="composer" onSubmit={sendMessage}>
-                  <textarea
-                      className="composerInput"
-                      placeholder="Napíš správu…"
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      rows={2}
-                  />
-                                    <button type="submit" className="govuk-button composerBtn" disabled={!draft.trim() || !activePartnerId}>
-                                        Odoslať
-                                    </button>
+                                    <textarea
+                                        className="composerInput"
+                                        placeholder="Napíš správu…"
+                                        value={draft}
+                                        onChange={(e) => setDraft(e.target.value)}
+                                        rows={2}
+                                    />
+
+                                    <div className="composerActions">
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            className="composerFile"
+                                            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                                        />
+
+                                        <button
+                                            type="submit"
+                                            className="govuk-button composerBtn"
+                                            disabled={!activePartnerId || (!draft.trim() && !file)}
+                                        >
+                                            Odoslať
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </main>
@@ -418,12 +594,13 @@ export default function ChatPage() {
                 </div>
             </div>
 
+
             {newOpen && (
-                <div className="chatModalOverlay" role="dialog" aria-modal="true">
-                    <div className="chatModal">
+                <div className="chatModalOverlay" role="dialog" aria-modal="true" onClick={() => closeModal()}>
+                    <div className="chatModal" onClick={(e) => e.stopPropagation()}>
                         <div className="chatModalHeader">
                             <div className="chatModalTitle">Nová správa</div>
-                            <button type="button" className="govuk-button govuk-button--secondary" onClick={() => setNewOpen(false)}>
+                            <button type="button" className="govuk-button govuk-button--secondary" onClick={() => closeModal()}>
                                 Zavrieť
                             </button>
                         </div>
@@ -431,29 +608,86 @@ export default function ChatPage() {
                         <label className="govuk-label" htmlFor="userSearch">
                             Komu:
                         </label>
+
                         <input
                             id="userSearch"
                             className="govuk-input"
                             value={userQ}
                             onChange={(e) => setUserQ(e.target.value)}
+                            onFocus={() => setUserOpen(true)}
+                            onBlur={() => {
+                                window.setTimeout(() => setUserOpen(false), 120);
+                            }}
                             placeholder="Začni písať meno alebo e-mail…"
+                            autoComplete="off"
                         />
 
-                        <div className="chatUserList">
-                            {userLoading && <div className="govuk-body">Načítavam…</div>}
-
-                            {!userLoading && userHits.length === 0 && (
-                                <div className="govuk-body">Nenašiel sa žiadny používateľ.</div>
-                            )}
-
-                            {!userLoading &&
-                                userHits.map((u) => (
-                                    <button key={u.id} type="button" className="chatUserItem" onClick={() => startNewWith(u.id)}>
-                                        <div className="chatUserName">{u.name}</div>
-                                        <div className="chatUserEmail">{u.email}</div>
+                        {selectedUsers.length > 0 && (
+                            <div className="chipsRow">
+                                {selectedUsers.map((u) => (
+                                    <button
+                                        key={u.id}
+                                        type="button"
+                                        className="chip"
+                                        onClick={() => removeSelected(u.id)}
+                                        title="Odstrániť"
+                                    >
+                                        {u.name} <span className="chipX">×</span>
                                     </button>
                                 ))}
-                        </div>
+                            </div>
+                        )}
+
+                        {showDropdown && (
+                            <div className="userDropdown" role="listbox">
+                                {userLoading && <div className="userDropdownEmpty">Načítavam…</div>}
+
+                                {!userLoading &&
+                                    userHits.map((u) => (
+                                        <button
+                                            key={u.id}
+                                            type="button"
+                                            className="userDropdownItem"
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                addSelected(u);
+                                                setUserQ("");
+                                                setUserHits([]);
+                                            }}
+                                        >
+                                            <div className="userDropdownName">{u.name}</div>
+                                            <div className="userDropdownEmail">{u.email}</div>
+                                        </button>
+                                    ))}
+
+                                {!userLoading && userHits.length === 0 && (
+                                    <div className="userDropdownEmpty">Nič sa nenašlo.</div>
+                                )}
+                            </div>
+                        )}
+
+                        <label className="govuk-label" htmlFor="bulkMsg" style={{ marginTop: 12 }}>
+                            Správa:
+                        </label>
+
+                        <textarea
+                            id="bulkMsg"
+                            className="composerInput"
+                            value={bulkText}
+                            onChange={(e) => setBulkText(e.target.value)}
+                            rows={3}
+                            placeholder="Napíš správu, ktorá sa pošle všetkým vybraným…"
+                        />
+
+                        <button
+                            type="button"
+                            className="govuk-button"
+                            disabled={selectedUsers.length === 0 || !bulkText.trim()}
+                            onClick={() => sendBulk().catch((e) => setErr(getErrorMessage(e)))}
+                        >
+                            Odoslať všetkým
+                        </button>
                     </div>
                 </div>
             )}

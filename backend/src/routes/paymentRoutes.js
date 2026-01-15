@@ -148,10 +148,6 @@ router.post('/edit-payment-settings', authenticate, async (req, res) => {
     console.log(userId);
     const now = new Date();
     const currentSettings = await prisma.paymentSettings.findFirst({
-        where: {
-            validFrom: { lte: now },
-            validTo:   { gte: now },
-        },
         orderBy: {
             validFrom: "desc",
         },
@@ -509,7 +505,6 @@ router.post("/generate-meals-statements", async (req, res) => {
                 amount: totalToPay,
                 vs: settings.mealsVarSym,
                 childName,
-                notePrefix: `Strava ${targetMonthHuman}/${targetYear}`,
                 recipientName: "Materská škola Upeješko",
             });
 

@@ -179,7 +179,7 @@ router.get("/me", authenticate, (req, res) => {
 
     res.setHeader("Cache-Control", "no-store");
     return res.json({
-      user: { id: u.id, email: u.email, role: roleText },
+      user: { id: u.id, firstName: u.firstName, lastName: u.lastName, email: u.email, role: roleText },
     });
   } catch (err) {
     console.error("GET /api/auth/me error:", err);

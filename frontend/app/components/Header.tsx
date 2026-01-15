@@ -5,7 +5,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type User = { id: number; email: string; role: unknown } | null;
+type User = { id: number; firstName: string, lastName: string, email: string; role: unknown } | null;
+function roleLabelSK(roleKey: string): string {
+    switch (roleKey) {
+        case "ADMIN":
+            return "Administrátor";
+        case "TEACHER":
+            return "Učiteľ";
+        case "PARENT":
+            return "Rodič";
+        default:
+            return roleKey ? roleKey : "";
+    }
+}
 
 export default function Header() {
   const router = useRouter();
@@ -97,7 +109,12 @@ export default function Header() {
               ) : (
                 <>
                   <span className="govuk-body-s" style={{ marginRight: 12 }}>
-                    Prihlásený: <b>{user?.email}</b>{roleText ? ` (${roleText})` : ""}
+                    Prihlásený: <b>{[user?.firstName, user?.lastName].filter(Boolean).join(" ")}</b>
+                      {roleKey && (
+                          <>
+                              {" "}(<span style={{ fontWeight: 600 }}>{roleLabelSK(roleKey)}</span>)
+                          </>
+                      )}
                   </span>
 
                     <Link
@@ -159,7 +176,7 @@ export default function Header() {
                       Dochádzka
                     </Link>
                   </li>
-                  <li className="govuk-header__navigation-item">
+                  {/*<li className="govuk-header__navigation-item">
                     <Link className="govuk-header__link" href="/events" title="Podujatia">
                       Podujatia
                     </Link>
@@ -168,7 +185,7 @@ export default function Header() {
                     <Link className="govuk-header__link" href="/announcement" title="Oznamy">
                       Oznamy
                     </Link>
-                  </li>
+                  </li>*/}
                 </>
               )}
 

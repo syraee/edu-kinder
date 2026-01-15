@@ -204,6 +204,11 @@ model Message {
   notified     Boolean  @default(false)
   readAt       DateTime?
 
+  isAttachment   Boolean @default(false)
+  attachmentName String?
+  attachmentMime String?
+  attachmentSize Int?
+
   sender       User     @relation("MessageSender", fields: [senderId], references: [id])
   recipient    User     @relation("MessageRecipient", fields: [recipientId], references: [id])
 

@@ -1,4 +1,5 @@
 require("dotenv").config()
+const path = require("path");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const cors = require('cors');
@@ -28,6 +29,8 @@ app.use(cookieParser());
 app.use("/api", routes);
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+const uploadsDir = path.join(process.cwd(), "uploads");
+app.use("/uploads", express.static(uploadsDir));
 
 app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
 
