@@ -202,7 +202,7 @@ export default function Header() {
                     </Link>
                   </li>
                     <li className="govuk-header__navigation-item">
-                        <Link className="govuk-header__link" href="/payment-management/payment-input-tuition" title="Platby">
+                        <Link className="govuk-header__link" href="/payment-management/payment-input-meals" title="Platby">
                             Platby
                         </Link>
                     </li>

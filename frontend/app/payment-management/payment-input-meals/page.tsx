@@ -245,7 +245,7 @@ export default function PaymentSettingsPage() {
 
                                     <button
                                         type="button"
-                                        className="govuk-button"
+                                        className="govuk-button" style={{ marginTop: 16 }}
                                         onClick={handleSavePayment}
                                     >
                                         Uložiť platbu
