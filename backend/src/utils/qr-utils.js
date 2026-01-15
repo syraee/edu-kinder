@@ -6,6 +6,9 @@ async function buildPayBySquareString({ iban, amount, vs, childName, notePrefix,
     const cleanIban = (iban || "").replace(/\s+/g, "");
     const numericAmount = Number(amount || 0);
 
+    const paymentNote = `${(childName || "").trim()} - stravné`
+        .trim()
+        .slice(0, 140);
 
     const model = {
 
@@ -17,7 +20,6 @@ async function buildPayBySquareString({ iban, amount, vs, childName, notePrefix,
                 bankAccounts: [{ iban: cleanIban }],
                 variableSymbol: vs ? String(vs) : "",
                 paymentNote,
-
                 beneficiaryName: recipientName || "Materská škola Upeješko",
             },
         ],

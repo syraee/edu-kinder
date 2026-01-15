@@ -8,6 +8,7 @@ const guardianRoutes = require("./guardianRoutes");
 const groupRoutes = require("./groupRoutes");
 const mealsRoutes = require("./mealsRoutes");
 const paymentRoutes = require("./paymentRoutes");
+const chatRoutes = require("./chatRoutes");
 
 
 
@@ -19,6 +20,7 @@ router.use("/guardian", guardianRoutes);
 router.use("/group", groupRoutes);
 router.use("/meals", mealsRoutes);
 router.use("/payment", paymentRoutes);
+router.use("/chat", chatRoutes);
 
 
 module.exports = router;

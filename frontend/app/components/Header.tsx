@@ -5,7 +5,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type User = { id: number; email: string; role: unknown } | null;
+type User = { id: number; firstName: string, lastName: string, email: string; role: unknown } | null;
+function roleLabelSK(roleKey: string): string {
+    switch (roleKey) {
+        case "ADMIN":
+            return "Administrátor";
+        case "TEACHER":
+            return "Učiteľ";
+        case "PARENT":
+            return "Rodič";
+        default:
+            return roleKey ? roleKey : "";
+    }
+}
 
 export default function Header() {
   const router = useRouter();
@@ -97,8 +109,38 @@ export default function Header() {
               ) : (
                 <>
                   <span className="govuk-body-s" style={{ marginRight: 12 }}>
-                    Prihlásený: <b>{user?.email}</b>{roleText ? ` (${roleText})` : ""}
+                    Prihlásený: <b>{[user?.firstName, user?.lastName].filter(Boolean).join(" ")}</b>
+                      {roleKey && (
+                          <>
+                              {" "}(<span style={{ fontWeight: 600 }}>{roleLabelSK(roleKey)}</span>)
+                          </>
+                      )}
                   </span>
+
+                    <Link
+                        href="/chat"
+                        className="header-icon-btn"
+                        title="Chat"
+                        aria-label="Chat"
+                        style={{ marginRight: 12, display: "inline-flex", alignItems: "center" }}
+                    >
+                        <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M20 14c0 1.1-.9 2-2 2H9l-4 4V6c0-1.1.9-2 2-2h11c1.1 0 2 .9 2 2v8z"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </Link>
 
                   <button
                     type="button"
@@ -134,7 +176,7 @@ export default function Header() {
                       Dochádzka
                     </Link>
                   </li>
-                  <li className="govuk-header__navigation-item">
+                  {/*<li className="govuk-header__navigation-item">
                     <Link className="govuk-header__link" href="/events" title="Podujatia">
                       Podujatia
                     </Link>
@@ -143,7 +185,7 @@ export default function Header() {
                     <Link className="govuk-header__link" href="/announcement" title="Oznamy">
                       Oznamy
                     </Link>
-                  </li>
+                  </li>*/}
                 </>
               )}
 
@@ -160,7 +202,7 @@ export default function Header() {
                     </Link>
                   </li>
                     <li className="govuk-header__navigation-item">
-                        <Link className="govuk-header__link" href="/payment-management/payment-input-tuition" title="Platby">
+                        <Link className="govuk-header__link" href="/payment-management/payment-input-meals" title="Platby">
                             Platby
                         </Link>
                     </li>
