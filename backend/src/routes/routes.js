@@ -7,6 +7,7 @@ const childRoutes = require("./childRoutes");
 const guardianRoutes = require("./guardianRoutes");
 const groupRoutes = require("./groupRoutes");
 const mealsRoutes = require("./mealsRoutes");
+const attendanceRoutes = require("./attendanceRoutes");
 
 
 router.use("/user", userRoutes);
@@ -15,6 +16,6 @@ router.use("/child", childRoutes);
 router.use("/guardian", guardianRoutes);
 router.use("/group", groupRoutes);
 router.use("/meals", mealsRoutes); 
-
+router.use("/attendance", attendanceRoutes);
 
 module.exports = router;

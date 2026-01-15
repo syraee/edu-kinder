@@ -28,6 +28,7 @@ model User {
   children  ChildGuardian[]
   loginTokens LoginToken[]
   sessions  Session[]
+  attendanceLogs AttendanceLog[]
 }
 
 model Role {
@@ -48,6 +49,8 @@ model Child {
 
   guardians ChildGuardian[]
   mealAttendances MealAttendance[]
+  attendances    Attendance[]
+  attendanceLogs AttendanceLog[]
 }
 
 model ChildGuardian {
@@ -99,4 +102,28 @@ model MealAttendance {
   updatedAt DateTime @updatedAt
   @@unique([childId, date])
   @@index([date])
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId   Int
+  date      DateTime
+  state     Int      
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([childId, date])
+}
+
+model AttendanceLog {
+  id        Int      @id @default(autoincrement())
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId   Int
+  date      DateTime
+  from      Int      
+  to        Int      
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    Int?
+  userEmail String
+  createdAt DateTime @default(now())
 }
