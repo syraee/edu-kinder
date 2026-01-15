@@ -289,79 +289,87 @@ export default function ChatPage() {
     }
 
     async function sendMessage(e?: FormEvent) {
-        if (e) e.preventDefault();
+  if (e) e.preventDefault();
 
-        const partnerId = activePartnerId;
-        const myId = me?.id ?? null;
+  const partnerId = activePartnerId;
+  const myId = me?.id ?? null;
+  if (!partnerId || !myId) return;
 
-        if (!partnerId || !myId) return;
+  const text = draft.trim();
 
-        const text = draft.trim();
-        const hasFile = file != null;
+  
+  const pickedFile = fileInputRef.current?.files?.[0] ?? null;
+  const hasFile = pickedFile != null;
 
-        if (!hasFile && !text) return;
+  
+  if (!hasFile && !text) return;
 
-        const optimistic: ThreadMsg = {
-            id: -Date.now(),
-            senderId: myId,
-            recipientId: partnerId,
-            value: hasFile ? (file?.name ?? "Príloha") : text,
-            createdAt: new Date().toISOString(),
-            readAt: null,
+  
+  const optimistic: ThreadMsg = {
+    id: -Date.now(),
+    senderId: myId,
+    recipientId: partnerId,
+    value: hasFile ? (pickedFile?.name ?? "Príloha") : text,
+    createdAt: new Date().toISOString(),
+    readAt: null,
+    isAttachment: hasFile,
+    attachmentName: hasFile ? (pickedFile?.name ?? null) : null,
+    attachmentMime: hasFile ? (pickedFile?.type || null) : null,
+    attachmentSize: hasFile ? (pickedFile?.size ?? null) : null,
+  };
 
-            isAttachment: hasFile,
-            attachmentName: hasFile ? (file?.name ?? null) : null,
-            attachmentMime: hasFile ? (file?.type || null) : null,
-            attachmentSize: hasFile ? (file?.size ?? null) : null,
-        };
+  setThread((prev) => [...prev, optimistic]);
 
-        setThread((prev) => [...prev, optimistic]);
-        setDraft("");
-        setFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
+  
+  setDraft("");
+  setFile(null);
+  if (fileInputRef.current) fileInputRef.current.value = "";
 
-        try {
-            let res: Response;
+  try {
+    let res: Response;
 
-            if (hasFile) {
+    if (hasFile) {
+      const fd = new FormData();
+      fd.append("recipientId", String(partnerId));
 
-                const fd = new FormData();
-                fd.append("recipientId", String(partnerId));
-                if (text) fd.append("message", text);
+      
+      if (text) fd.append("value", text);
 
-                res = await fetch(`${API_BASE}/api/chat/send`, {
-                    method: "POST",
-                    credentials: "include",
-                    body: fd,
-                });
-            } else {
-                // json
-                res = await fetch(`${API_BASE}/api/chat/send`, {
-                    method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ recipientId: partnerId, value: text }),
-                });
-            }
+    
+      fd.append("file", pickedFile);
 
-            const raw: unknown = await res.json();
-            const parsed = parseApiResponse<unknown>(raw);
-
-            if (!res.ok || parsed.success === false) {
-                throw new Error(parsed.success === false ? parsed.error ?? "Failed to send" : "Failed to send");
-            }
-
-            await openThread(partnerId);
-            await fetchConversations();
-        } catch (errx) {
-            setErr(getErrorMessage(errx));
-
-            setThread((prev) => prev.filter((m) => m.id !== optimistic.id));
-
-            if (!hasFile) setDraft(text);
-
-        }
+      res = await fetch(`${API_BASE}/api/chat/send`, {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+    } else {
+      res = await fetch(`${API_BASE}/api/chat/send`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipientId: partnerId, value: text }),
+      });
     }
+
+    const raw: unknown = await res.json();
+    const parsed = parseApiResponse<unknown>(raw);
+
+    if (!res.ok || parsed.success === false) {
+      throw new Error(parsed.success === false ? parsed.error ?? "Failed to send" : "Failed to send");
+    }
+
+    await openThread(partnerId);
+    await fetchConversations();
+  } catch (errx) {
+    setErr(getErrorMessage(errx));
+    setThread((prev) => prev.filter((m) => m.id !== optimistic.id));
+
+    
+    if (!hasFile) setDraft(text);
+  }
+}
+
 
     useEffect(() => {
         let alive = true;

@@ -430,165 +430,111 @@ a.govuk-button .add-parent {
   }
 
 
-.payment-settings__box {
-    border: 1px solid #dcdcdc;
-    border-radius: 4px;
-    background-color: #f8f8f8;
-}
 
-.payment-settings__row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    gap: 1rem;
-}
 
-.payment-settings__label {
-    font-size: 1.1rem;
-}
 
-.payment-settings__box .govuk-input {
-    font-size: 1.2rem;
-}
-
-.payment-settings__value {
-
-    min-width: 6rem;
-    font-size: 1.2rem;
-    text-align: right;
-    display: inline-block;
-}
-
-.payment-settings__input {
-    text-align: right;
-}
-
-.payment-settings__row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.payment-settings__label {
-    font-weight: 400;
-}
-
-.payment-settings__input {
-    text-align: right;
-}
-
-.payment-settings__input--compact {
-    height: 2rem;
-    padding: 2px 6px;
-    font-size: 0.9rem;
-}
-
-.payment-settings__input--compact-long {
-    height: 2rem;
-    padding: 2px 6px;
-    font-size: 0.9rem;
-}
-
-.payment-settings__actions {
+.month-nav-wrap{
     display: flex;
     justify-content: flex-end;
-    gap: 0.75rem;
+    margin-bottom: 16px;
 }
 
-.parent-suggestions {
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    max-height: 200px;
-    overflow-y: auto;
-    margin-top: 10px;
-    position: absolute;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.parent-suggestions ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-
-.parent-suggestions li {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-.parent-suggestions li:hover {
-    background-color: #f1f1f1;
-}
-
-.parent-suggestions li:last-child {
-    border-bottom: none;
-}
-
-.payment-log-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 4rem 1rem;
-    z-index: 9999;
-}
-
-.payment-log-modal {
-    background: #fff;
-    max-width: 960px;
-    width: 100%;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-}
-
-.payment-log-modal__header {
-    display: flex;
-    justify-content: space-between;
+.month-nav{
+    display: inline-grid;
+    grid-template-columns: 36px auto 36px;
     align-items: center;
-    margin-bottom: 1.5rem;
+    gap: 12px;
+    width: fit-content;
 }
 
-.payment-log-modal__close {
-    margin-bottom: 0;
+.month-nav .govuk-button { margin: 0; }
+
+.month-nav .btn-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0 !important;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+    box-sizing: border-box;
+    font-size: 18px;
 }
 
-.payment-log-row--changed {
-    background-color: #fff7d1;
+.month-nav .month-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.payment-log-value--changed {
-    font-weight: 600;
-    text-decoration: underline;
+
+
+
+
+
+
+
+
+  .toast {
+    max-width: 100%;
+    border-radius: 0.75rem;
+  }
 }
 
-.payment-amount-row {
-    display: flex;
-    align-items: center;
-    max-width: 480px;
+/*dropdown pri rodicoch*/
+.actions .menu-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
 }
 
-.payment-amount-row .govuk-input {
-    flex: 1;
+.dropdown {
+  background: white;
+  border: 1px solid #b1b4b6;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.payment-amount-row .govuk-button {
-    margin-left: 0.75rem;
-    margin-top: 0;
-    margin-bottom: 0;
+.dropdown button {
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-.payments .govuk-table__header {
-    text-align: left;
+.dropdown button:hover {
+  background: #f3f2f1;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 2000;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .header-icon-btn {
@@ -607,27 +553,6 @@ a.govuk-button .add-parent {
     outline-offset: 2px;
 }
 
-.chipsRow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.chip {
-    border: 1px solid #d8dde0;
-    background: #f3f2f1;
-    border-radius: 999px;
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.chipX {
-    font-weight: 800;
-    margin-left: 6px;
-}
 
 
 .pageRow {
@@ -1003,6 +928,203 @@ a.govuk-button .add-parent {
     opacity: 0.7;
 }
 
+
+
+
+
+
+
+
+
+.payment-settings__box {
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+}
+
+.payment-settings__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+}
+
+.payment-settings__label {
+    font-size: 1.1rem;
+}
+
+.payment-settings__box .govuk-input {
+    font-size: 1.2rem;
+}
+
+.payment-settings__value {
+
+    min-width: 6rem;
+    font-size: 1.2rem;
+    text-align: right;
+    display: inline-block;
+}
+
+.payment-settings__input {
+    text-align: right;
+}
+
+.payment-settings__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.payment-settings__label {
+    font-weight: 400;
+}
+
+.payment-settings__input {
+    text-align: right;
+}
+
+.payment-settings__input--compact {
+    height: 2rem;
+    padding: 2px 6px;
+    font-size: 0.9rem;
+}
+
+.payment-settings__input--compact-long {
+    height: 2rem;
+    padding: 2px 6px;
+    font-size: 0.9rem;
+}
+
+.payment-settings__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.parent-suggestions {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.parent-suggestions ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.parent-suggestions li {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.parent-suggestions li:hover {
+    background-color: #f1f1f1;
+}
+
+.parent-suggestions li:last-child {
+    border-bottom: none;
+}
+
+.payment-log-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 4rem 1rem;
+    z-index: 9999;
+}
+
+.payment-log-modal {
+    background: #fff;
+    max-width: 960px;
+    width: 100%;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.payment-log-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.payment-log-modal__close {
+    margin-bottom: 0;
+}
+
+.payment-log-row--changed {
+    background-color: #fff7d1;
+}
+
+.payment-log-value--changed {
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.payment-amount-row {
+    display: flex;
+    align-items: center;
+    max-width: 480px;
+}
+
+.payment-amount-row .govuk-input {
+    flex: 1;
+}
+
+.payment-amount-row .govuk-button {
+    margin-left: 0.75rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.payments .govuk-table__header {
+    text-align: left;
+}
+
+
+
+
+.chipsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.chip {
+    border: 1px solid #d8dde0;
+    background: #f3f2f1;
+    border-radius: 999px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.chipX {
+    font-weight: 800;
+    margin-left: 6px;
+}
+
+
+
+
 .userDropdown {
     margin-top: 6px;
     border: 1px solid #d8dde0;
@@ -1042,108 +1164,3 @@ a.govuk-button .add-parent {
     font-size: 13px;
     opacity: 0.7;
 }
-
-.month-nav-wrap{
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
-}
-
-.month-nav{
-    display: inline-grid;
-    grid-template-columns: 36px auto 36px;
-    align-items: center;
-    gap: 12px;
-    width: fit-content;
-}
-
-.month-nav .govuk-button { margin: 0; }
-
-.month-nav .btn-icon {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    padding: 0 !important;
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    line-height: 1;
-    box-sizing: border-box;
-    font-size: 18px;
-}
-
-.month-nav .month-label {
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-
-
-
-
-
-
-
-
-  .toast {
-    max-width: 100%;
-    border-radius: 0.75rem;
-  }
-}
-
-/*dropdown pri rodicoch*/
-.actions .menu-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 20px;
-  line-height: 1;
-  padding: 4px 8px;
-}
-
-.dropdown {
-  background: white;
-  border: 1px solid #b1b4b6;
-  border-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.dropdown button {
-  text-align: left;
-  border: none;
-  background: transparent;
-  padding: 8px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.dropdown button:hover {
-  background: #f3f2f1;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 2000;
-}
-
-.modal-card {
-  width: 100%;
-  max-width: 520px;
-  background: #fff;
-  border-radius: 10px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
