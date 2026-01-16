@@ -56,6 +56,8 @@ model Child {
   guardians ChildGuardian[]
   mealAttendances MealAttendance[]
 
+  FaceEmbedding FaceEmbedding[]
+
   attendances    Attendance[]
   attendanceLogs AttendanceLog[]
 
@@ -83,6 +85,8 @@ model GroupClass {
   roomName        String
 
   children     Child[]
+  events       EventOnClass[]
+  PhotoOnClass PhotoOnClass[]
 }
 
 model LoginToken {
@@ -120,7 +124,7 @@ model Attendance {
   child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
   childId   Int
   date      DateTime
-  state     Int      
+  state     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@unique([childId, date])
@@ -131,8 +135,8 @@ model AttendanceLog {
   child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
   childId   Int
   date      DateTime
-  from      Int      
-  to        Int      
+  from      Int
+  to        Int
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId    Int?
   userEmail String
@@ -246,4 +250,59 @@ model Message {
   @@index([senderId, createdAt])
   @@index([recipientId, createdAt])
   @@index([senderId, recipientId, createdAt])
+}
+
+
+enum FaceRecognitionStatus {
+  pending
+  processing
+  done
+  failed
+}
+
+model EventOnClass {
+  eventId Int
+  classId Int
+
+  event Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  class GroupClass @relation(fields: [classId], references: [id])
+
+  @@id([eventId, classId])
+}
+
+model Event {
+  id         Int            @id @default(autoincrement())
+  name       String
+  schoolYear String
+  photos     Photo[]
+  classes    EventOnClass[]
+}
+
+model PhotoOnClass {
+  photoId Int
+  classId Int
+  photo   Photo      @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  class   GroupClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@id([photoId, classId])
+}
+
+model Photo {
+  id           Int            @id @default(autoincrement())
+  filePath     String
+  eventId      Int
+  event        Event          @relation(fields: [eventId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt @db.Timestamp(6)
+  PhotoOnClass PhotoOnClass[]
+}
+
+model FaceEmbedding {
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  embedding Float[] // InsightFace embedding je pole čísel (napr. 512-dim)
+  createdAt DateTime @default(now())
+
+  @@index([childId])
 }

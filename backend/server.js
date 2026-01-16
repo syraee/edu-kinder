@@ -26,6 +26,7 @@ app.use((req, res, next) => {
 //Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static('uploads'));
 app.use("/api", routes);
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
