@@ -3,6 +3,7 @@ import "./styles/application.scss";
 import "./styles/menu.scss";
 import IdskInit from "./components/IdskInit";
 import { ToastProvider } from "./components/ToastProvider";
+import TestBanner from "@/app/components/TestBanner";
 
 export const metadata = {
   title: "EduKinder",
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ToastProvider>
           <IdskInit />
+          <TestBanner />
           {children}
         </ToastProvider>
       </body>
