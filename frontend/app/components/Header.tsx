@@ -336,7 +336,7 @@ export default function Header() {
   }
 
  
-  @media (max-width: 40.0525em) {
+  @media (max-width: 48em) {
     /* Top row: logo left, hamburger right */
     .header-top {
       display: flex;
@@ -493,6 +493,11 @@ export default function Header() {
   stroke: #072c66 !important;
 }
 
+@media (max-width: 48em) {
+  a.header-chat-icon {
+    padding: 10px 5px;
+  }
+}
 
 
     .header-chat-icon:focus {

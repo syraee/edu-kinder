@@ -151,56 +151,57 @@ export default function ParentsPage() {
     return sortAsc ? "↑" : "↓";
   }
 
-  return (
-    <>
-      <Header />
+ return (
+  <>
+    <Header />
 
-      <div className="govuk-width-container" style={{ marginTop: "2rem" }}>
-        <h1 className="govuk-heading-xl" style={{ marginBottom: "1rem" }}>
-          Rodičia
-        </h1>
+    <div className="govuk-width-container parents-page" style={{ marginTop: "2rem" }}>
+      <h1 className="govuk-heading-xl" style={{ marginBottom: "1rem" }}>
+        Rodičia
+      </h1>
 
-        <div
-          className="searchbar-row"
+      <div
+        className="searchbar-row"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          flexWrap: "wrap",
+          gap: "1rem",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Vyhľadať podľa mena, e-mailu alebo dieťaťa..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="govuk-input"
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            flexWrap: "wrap",
-            gap: "1rem",
-            marginBottom: "1.5rem",
+            flex: "1",
+            minWidth: "280px",
+            maxWidth: "600px",
+            height: "40px",
           }}
+        />
+
+        <Link
+          href="/admin-dashboard"
+          className="govuk-button add-parent"
+          role="button"
+          data-module="govuk-button"
+          style={{ marginBottom: "2px" }}
         >
-          <input
-            type="text"
-            placeholder="Vyhľadať podľa mena, e-mailu alebo dieťaťa..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="govuk-input"
-            style={{
-              flex: "1",
-              minWidth: "280px",
-              maxWidth: "600px",
-              height: "40px",
-            }}
-          />
+          + Pridať rodiča
+        </Link>
+      </div>
 
-          <Link
-            href="/admin-dashboard"
-            className="govuk-button add-parent"
-            role="button"
-            data-module="govuk-button"
-            style={{ marginBottom: "2px" }}
-          >
-            + Pridať rodiča
-          </Link>
-        </div>
-
-        {loading ? (
-          <p className="govuk-body">Načítavam údaje...</p>
-        ) : filteredParents.length === 0 ? (
-          <p className="govuk-body">Nenašli sa žiadni rodičia.</p>
-        ) : (
+      {loading ? (
+        <p className="govuk-body">Načítavam údaje...</p>
+      ) : filteredParents.length === 0 ? (
+        <p className="govuk-body">Nenašli sa žiadni rodičia.</p>
+      ) : (
+        <div className="parent-table-wrap">
           <div className="parent-table">
             <div className="parent-table-header">
               <div onClick={() => sortBy("firstName")} style={{ cursor: "pointer" }}>
@@ -285,9 +286,9 @@ export default function ParentsPage() {
                         Upraviť
                       </button>
 
-
                       <button
                         type="button"
+                        role="menuitem"
                         onClick={(e) => {
                           e.stopPropagation();
                           setOpenMenu(null);
@@ -296,7 +297,6 @@ export default function ParentsPage() {
                       >
                         Odobrať
                       </button>
-
 
                       <button
                         type="button"
@@ -309,291 +309,288 @@ export default function ParentsPage() {
                       >
                         Zobraziť dieťa
                       </button>
-
                     </div>
                   )}
                 </div>
               </div>
             ))}
           </div>
-        )}
+        </div>
+      )}
+    </div>
+
+    {/* DELETE MODAL */}
+    {deleteTarget && (
+      <div
+        className="modal-backdrop"
+        role="dialog"
+        aria-modal="true"
+        onClick={() => setDeleteTarget(null)}
+      >
+        <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2 className="govuk-heading-m" style={{ marginTop: 0, marginBottom: 0 }}>
+              Odstrániť rodiča?
+            </h2>
+
+            <button
+              type="button"
+              onClick={() => setDeleteTarget(null)}
+              style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18 }}
+              aria-label="Zavrieť"
+            >
+              ✕
+            </button>
+          </div>
+
+          <p className="govuk-body">
+            Naozaj chceš odstrániť rodiča{" "}
+            <strong>
+              {deleteTarget.firstName ?? "—"} {deleteTarget.lastName ?? ""}
+            </strong>{" "}
+            ({deleteTarget.email})?
+          </p>
+
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="govuk-button govuk-button--secondary"
+              onClick={() => setDeleteTarget(null)}
+            >
+              Zrušiť
+            </button>
+
+            <button
+              type="button"
+              className="govuk-button"
+              onClick={() => {
+                // TODO: delete + refresh zoznamu
+                setDeleteTarget(null);
+              }}
+            >
+              Potvrdiť
+            </button>
+          </div>
+        </div>
       </div>
+    )}
 
-      {deleteTarget && (
+    {/* EDIT MODAL */}
+    {editTarget && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        onClick={() => setEditTarget(null)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.35)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 16,
+          zIndex: 9999,
+        }}
+      >
         <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setDeleteTarget(null)}
-        >
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 className="govuk-heading-m" style={{ marginTop: 0, marginBottom: 0 }}>
-                Odstrániť rodiča?
-              </h2>
-
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(null)}
-                style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18 }}
-                aria-label="Zavrieť"
-              >
-                ✕
-              </button>
-            </div>
-
-
-            <p className="govuk-body">
-              Naozaj chceš odstrániť rodiča{" "}
-              <strong>
-                {deleteTarget.firstName ?? "—"} {deleteTarget.lastName ?? ""}
-              </strong>{" "}
-              ({deleteTarget.email})?
-            </p>
-
-            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-              <button
-                type="button"
-                className="govuk-button govuk-button--secondary"
-                onClick={() => setDeleteTarget(null)}
-              >
-                Zrušiť
-              </button>
-
-              <button
-                type="button"
-                className="govuk-button"
-                onClick={() => {
-                  // TODO: delete + refresh zoznamu
-                  setDeleteTarget(null);
-                }}
-              >
-                Potvrdiť
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {editTarget && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setEditTarget(null)}
+          onClick={(e) => e.stopPropagation()}
           style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: "100%",
+            maxWidth: 560,
+            background: "#fff",
+            borderRadius: 10,
             padding: 16,
-            zIndex: 9999,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "100%",
-              maxWidth: 560,
-              background: "#fff",
-              borderRadius: 10,
-              padding: 16,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <h2 className="govuk-heading-m" style={{ marginTop: 0, marginBottom: 0 }}>
-                Upraviť rodiča
-              </h2>
-              <button
-                type="button"
-                onClick={() => setEditTarget(null)}
-                style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18 }}
-                aria-label="Zavrieť"
-              >
-                ✕
-              </button>
-            </div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+            <h2 className="govuk-heading-m" style={{ marginTop: 0, marginBottom: 0 }}>
+              Upraviť rodiča
+            </h2>
+            <button
+              type="button"
+              onClick={() => setEditTarget(null)}
+              style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18 }}
+              aria-label="Zavrieť"
+            >
+              ✕
+            </button>
+          </div>
 
-            <p className="govuk-body" style={{ marginTop: 8 }}>
-              Účet: <strong>{editTarget.email}</strong>
-            </p>
+          <p className="govuk-body" style={{ marginTop: 8 }}>
+            Účet: <strong>{editTarget.email}</strong>
+          </p>
 
-            <div className="govuk-form-group">
-              <label className="govuk-label">Meno</label>
-              <input
-                className="govuk-input"
-                value={editForm.firstName}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, firstName: e.target.value }))}
-              />
-            </div>
+          <div className="govuk-form-group">
+            <label className="govuk-label">Meno</label>
+            <input
+              className="govuk-input"
+              value={editForm.firstName}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, firstName: e.target.value }))}
+            />
+          </div>
 
-            <div className="govuk-form-group">
-              <label className="govuk-label">Priezvisko</label>
-              <input
-                className="govuk-input"
-                value={editForm.lastName}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, lastName: e.target.value }))}
-              />
-            </div>
+          <div className="govuk-form-group">
+            <label className="govuk-label">Priezvisko</label>
+            <input
+              className="govuk-input"
+              value={editForm.lastName}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, lastName: e.target.value }))}
+            />
+          </div>
 
-            <div className="govuk-form-group">
-              <label className="govuk-label">Telefón</label>
-              <input
-                className="govuk-input"
-                value={editForm.phone}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, phone: e.target.value }))}
-              />
-            </div>
+          <div className="govuk-form-group">
+            <label className="govuk-label">Telefón</label>
+            <input
+              className="govuk-input"
+              value={editForm.phone}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, phone: e.target.value }))}
+            />
+          </div>
 
-            <div className="govuk-form-group">
-              <label className="govuk-label">E-mail</label>
-              <input
-                className="govuk-input"
-                value={editForm.email}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
+          <div className="govuk-form-group">
+            <label className="govuk-label">E-mail</label>
+            <input
+              className="govuk-input"
+              value={editForm.email}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, email: e.target.value }))}
+            />
+          </div>
 
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 12 }}>
-              <button
-                type="button"
-                className="govuk-button govuk-button--secondary"
-                onClick={() => setEditTarget(null)}
-              >
-                Zrušiť
-              </button>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 12 }}>
+            <button
+              type="button"
+              className="govuk-button govuk-button--secondary"
+              onClick={() => setEditTarget(null)}
+            >
+              Zrušiť
+            </button>
 
-              <button
-                type="button"
-                className="govuk-button"
-                onClick={() => {
-                  // zatiaľ len frontend
-                  console.log("SAVE parent", editTarget.id, editForm);
+            <button
+              type="button"
+              className="govuk-button"
+              onClick={() => {
+                console.log("SAVE parent", editTarget.id, editForm);
 
-                  const updated: Parent = {
-                    ...editTarget,
-                    firstName: editForm.firstName || null,
-                    lastName: editForm.lastName || null,
-                    phone: editForm.phone || null,
-                    email: editForm.email,
-                  };
+                const updated: Parent = {
+                  ...editTarget,
+                  firstName: editForm.firstName || null,
+                  lastName: editForm.lastName || null,
+                  phone: editForm.phone || null,
+                  email: editForm.email,
+                };
 
-                  setParents((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-                  setFilteredParents((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+                setParents((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+                setFilteredParents((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
 
-                  setEditTarget(null);
-                }}
-              >
-                Uložiť
-              </button>
-            </div>
+                setEditTarget(null);
+              }}
+            >
+              Uložiť
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-
-      {childrenTarget && (
+    {/* CHILDREN MODAL */}
+    {childrenTarget && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        onClick={() => setChildrenTarget(null)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.35)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 16,
+          zIndex: 9999,
+        }}
+      >
         <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setChildrenTarget(null)}
+          onClick={(e) => e.stopPropagation()}
           style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: "100%",
+            maxWidth: 560,
+            background: "#fff",
+            borderRadius: 10,
             padding: 16,
-            zIndex: 9999,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "100%",
-              maxWidth: 560,
-              background: "#fff",
-              borderRadius: 10,
-              padding: 16,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <h2 className="govuk-heading-m" style={{ marginTop: 0, marginBottom: 0 }}>
-                Deti rodiča
-              </h2>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+            <h2 className="govuk-heading-m" style={{ marginTop: 0, marginBottom: 0 }}>
+              Deti rodiča
+            </h2>
 
-              <button
-                type="button"
-                onClick={() => setChildrenTarget(null)}
-                style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18 }}
-                aria-label="Zavrieť"
-              >
-                ✕
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setChildrenTarget(null)}
+              style={{ border: "none", background: "transparent", cursor: "pointer", fontSize: 18 }}
+              aria-label="Zavrieť"
+            >
+              ✕
+            </button>
+          </div>
 
-            <p className="govuk-body" style={{ marginTop: 8 }}>
-              Rodič:{" "}
-              <strong>
-                {childrenTarget.firstName ?? "—"} {childrenTarget.lastName ?? ""}
-              </strong>{" "}
-              ({childrenTarget.email})
-            </p>
+          <p className="govuk-body" style={{ marginTop: 8 }}>
+            Rodič:{" "}
+            <strong>
+              {childrenTarget.firstName ?? "—"} {childrenTarget.lastName ?? ""}
+            </strong>{" "}
+            ({childrenTarget.email})
+          </p>
 
-            {(childrenTarget.children?.length ?? 0) === 0 ? (
-              <p className="govuk-body">Tento rodič nemá priradené žiadne dieťa.</p>
-            ) : (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-                {childrenTarget.children.map((c) => (
-                  <div
-                    key={c.id}
-                    style={{
-                      border: "1px solid #b1b4b6",
-                      borderRadius: 8,
-                      padding: "10px 12px",
-                      background: "#f8f8f8",
-                      minWidth: 160,
+          {(childrenTarget.children?.length ?? 0) === 0 ? (
+            <p className="govuk-body">Tento rodič nemá priradené žiadne dieťa.</p>
+          ) : (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+              {childrenTarget.children.map((c) => (
+                <div
+                  key={c.id}
+                  style={{
+                    border: "1px solid #b1b4b6",
+                    borderRadius: 8,
+                    padding: "10px 12px",
+                    background: "#f8f8f8",
+                    minWidth: 160,
+                  }}
+                >
+                  <div style={{ fontWeight: 700 }}>
+                    {c.firstName} {c.lastName}
+                  </div>
+                  <div style={{ fontSize: 12, opacity: 0.8 }}>ID: {c.id}</div>
+
+                  <button
+                    type="button"
+                    className="govuk-button govuk-button--secondary"
+                    style={{ marginTop: 10, marginBottom: 0, width: "100%" }}
+                    onClick={() => {
+                      alert(`Dieťa: ${c.firstName} ${c.lastName} (id ${c.id})`);
                     }}
                   >
-                    <div style={{ fontWeight: 700 }}>
-                      {c.firstName} {c.lastName}
-                    </div>
-                    <div style={{ fontSize: 12, opacity: 0.8 }}>ID: {c.id}</div>
-
-                    {/* zatiaľ len placeholder */}
-                    <button
-                      type="button"
-                      className="govuk-button govuk-button--secondary"
-                      style={{ marginTop: 10, marginBottom: 0, width: "100%" }}
-                      onClick={() => {
-                        alert(`Dieťa: ${c.firstName} ${c.lastName} (id ${c.id})`);
-                      }}
-                    >
-                      Detail
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-              <button
-                type="button"
-                className="govuk-button govuk-button--secondary"
-                onClick={() => setChildrenTarget(null)}
-              >
-                Zavrieť
-              </button>
+                    Detail
+                  </button>
+                </div>
+              ))}
             </div>
+          )}
+
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+            <button
+              type="button"
+              className="govuk-button govuk-button--secondary"
+              onClick={() => setChildrenTarget(null)}
+            >
+              Zavrieť
+            </button>
           </div>
         </div>
-      )}
-
-    </>
-  );
+      </div>
+    )}
+  </>
+);
 }
