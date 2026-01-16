@@ -93,7 +93,7 @@ export default function InviteTeachersPage() {
             setPhone("");
             setSearch("");
             setError("");
-            setBanner({ type: "success", text: "Učiteľ úspešne pridaný do databázy" });
+            setBanner({ type: "success", text: "Učiteľ úspešne pridaný do zoznamu" });
         } catch (err) {
             console.error("❌ Chyba pri pridávaní učiteľa:", err);
             setBanner({ type: "error", text: "Nepodarilo sa pridať učiteľa." });
@@ -164,7 +164,9 @@ export default function InviteTeachersPage() {
     return (
         <>
             <Header />
-            <main className="govuk-main-wrapper auth-center govuk-width-container" id="main-content" role="main">
+          
+
+            <main className="govuk-main-wrapper auth-center govuk-width-container invite-teachers" id="main-content" role="main">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-two-thirds">
                         <h1 className="govuk-heading-xl">Pozvanie učiteľov – vytvorenie konta</h1>
