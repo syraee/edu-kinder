@@ -982,3 +982,91 @@ $govuk-assets-path: "/idsk-assets/";
     display: block;
   }
 }
+
+.test-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: #ffdd00;
+  color: #0b0c0c;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.test-banner__inner {
+  position: relative;
+  padding: 12px 44px 12px 12px;
+}
+
+.test-banner__text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.test-banner__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  border: 2px solid #0b0c0c;
+  background: rgba(11, 12, 12, 0.06);
+  white-space: nowrap;
+}
+
+.test-banner__msg {
+  opacity: 0.95;
+}
+
+.test-banner__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 2px solid rgba(11, 12, 12, 0.7);
+  background: transparent;
+  color: #0b0c0c;
+  font-size: 22px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.test-banner__close:hover {
+  background: rgba(11, 12, 12, 0.08);
+}
+
+@media (max-width: 767px) {
+  .test-banner {
+    top: 0;
+    bottom: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .test-banner__text {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+@media (min-width: 768px) {
+  .govuk-main-wrapper {
+    padding-bottom: 64px;
+  }
+}
+
+@media (max-width: 767px) {
+  .govuk-main-wrapper {
+    padding-top: 72px;
+  }
+}
