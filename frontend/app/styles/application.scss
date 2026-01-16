@@ -2,6 +2,7 @@ $govuk-assets-path: "/idsk-assets/";
 @import "../../node_modules/@id-sk/frontend/dist/govuk/all";
 
 @import "./menu.scss";
+@import "./gallery.scss";
 
 .idsk-docs__row {
   display: grid;

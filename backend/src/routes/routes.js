@@ -12,6 +12,7 @@ const paymentRoutes = require("./paymentRoutes");
 const chatRoutes = require("./chatRoutes");
 
 
+const photosRoutes = require("./photosRoutes");
 
 
 router.use("/user", userRoutes);
@@ -19,9 +20,9 @@ router.use("/auth", authRoutes);
 router.use("/child", childRoutes);
 router.use("/guardian", guardianRoutes);
 router.use("/group", groupRoutes);
-router.use("/meals", mealsRoutes); 
-router.use("/attendance", attendanceRoutes);
 router.use("/meals", mealsRoutes);
+router.use("/photo", photosRoutes);
+router.use("/attendance", attendanceRoutes);
 router.use("/payment", paymentRoutes);
 router.use("/chat", chatRoutes);
 

@@ -12,3 +12,29 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+  face-recognition:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: face_recognition
+    volumes:
+      - ./faceRecognition:/app/faceRecognition:rw
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: postgres
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    command:
+      - uvicorn
+      - faceRecognition.recognize:app
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      - --reload
+      - --reload-dir
+      - /app/faceRecognition

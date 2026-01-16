@@ -1,0 +1,9 @@
+insightface==0.7.3
+numpy
+opencv-python-headless
+tqdm
+requests
+onnxruntime
+fastapi
+uvicorn
+python-multipart
