@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 
 type State = "default" | "sent" | "error";
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://edu-kinder.onrender.com";
 
 export default function PrihlaseniePage() {
   const [state, setState] = useState<State>("default");
