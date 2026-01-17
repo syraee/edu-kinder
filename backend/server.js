@@ -21,7 +21,7 @@ const allowlist = (process.env.CORS_ORIGIN || "http://localhost:3000")
 
 const corsOptions = {
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // curl/postman/server-to-server
+    if (!origin) return cb(null, true);
     if (allowlist.includes(origin)) return cb(null, true);
     return cb(new Error("Not allowed by CORS: " + origin));
   },
@@ -31,9 +31,16 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("/*", cors(corsOptions)); 
 
-// Loguj hneď na začiatku (uvidíš aj preflight)
+
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return cors(corsOptions)(req, res, next);
+  }
+  next();
+});
+
+// Loguj hneď na začiatku
 app.use((req, _res, next) => {
   console.log(req.method, req.path, "origin:", req.headers.origin || "-");
   next();
@@ -43,7 +50,7 @@ app.use((req, _res, next) => {
 app.use(express.json());
 app.use(cookieParser());
 
-// Static uploads (stačí 1x)
+// Static uploads
 const uploadsDir = path.join(process.cwd(), "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
@@ -59,10 +66,9 @@ app.get("/", (_req, res) => {
   res.redirect("/api-docs");
 });
 
-// Error handler (posledný)
+// Error handler
 app.use(errorHandler);
 
-// Start server
 app.listen(PORT, () => {
   console.log(`\nServer is running!\n`);
   console.log(`Local: http://localhost:${PORT}\n`);
