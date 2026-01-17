@@ -10,18 +10,34 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const ORIGIN = 'http://localhost:3000';
-app.use(cors({ origin: ORIGIN, credentials: true }));
+const allowlist = (process.env.CORS_ORIGIN || "http://localhost:3000")
+  .split(",")
+  .map((s) => s.trim());
 
-// fallback, keby niečo prešlo mimo cors() – nech je 100% istota
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true); // curl/postman
+      if (allowlist.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+// fallback headers (nech ostane, ale nech používa origin z requestu keď je povolený)
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', ORIGIN);
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    if (req.method === 'OPTIONS') return res.sendStatus(204);
-    next();
+  const origin = req.headers.origin;
+  if (origin && allowlist.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
 });
+
 
 //Middleware
 app.use(express.json());
