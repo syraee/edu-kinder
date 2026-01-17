@@ -31,7 +31,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); 
+app.options("/*", cors(corsOptions)); 
 
 // Loguj hneď na začiatku (uvidíš aj preflight)
 app.use((req, _res, next) => {
