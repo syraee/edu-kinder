@@ -1,65 +1,70 @@
-require("dotenv").config()
+require("dotenv").config();
+
 const path = require("path");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
-const cors = require('cors');
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const routes = require("./src/routes/routes");
+const authRoutes = require("./src/routes/authRoutes");
 const errorHandler = require("./src/middleware/errorHandler");
 const swaggerFile = require("./swagger-output.json");
-const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
 const allowlist = (process.env.CORS_ORIGIN || "http://localhost:3000")
   .split(",")
-  .map((s) => s.trim());
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // curl/postman
-      if (allowlist.includes(origin)) return cb(null, true);
-      return cb(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // curl/postman/server-to-server
+    if (allowlist.includes(origin)) return cb(null, true);
+    return cb(new Error("Not allowed by CORS: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-// fallback headers (nech ostane, ale nech používa origin z requestu keď je povolený)
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin && allowlist.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); 
+
+// Loguj hneď na začiatku (uvidíš aj preflight)
+app.use((req, _res, next) => {
+  console.log(req.method, req.path, "origin:", req.headers.origin || "-");
   next();
 });
 
-
-//Middleware
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use('/uploads', express.static('uploads'));
-app.use("/api", routes);
-app.use('/api/auth', require('./src/routes/authRoutes'));
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+// Static uploads (stačí 1x)
 const uploadsDir = path.join(process.cwd(), "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
-app.use((req, _res, next) => { console.log(req.method, req.path); next(); });
+// Routes
+app.use("/api", routes);
+app.use("/api/auth", authRoutes);
 
-app.get("/", (req, res) => {
-    res.redirect("/api-docs");
+// Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+// Root
+app.get("/", (_req, res) => {
+  res.redirect("/api-docs");
 });
 
-
-//Error handler
+// Error handler (posledný)
 app.use(errorHandler);
+
 // Start server
 app.listen(PORT, () => {
-    console.log(`\nServer is running!\n`);
-    console.log(`Open in browser: http://localhost:${PORT}\n`);
+  console.log(`\nServer is running!\n`);
+  console.log(`Local: http://localhost:${PORT}\n`);
+  console.log(`Allowed CORS origins:`, allowlist);
 });
