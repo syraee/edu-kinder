@@ -3,7 +3,7 @@
 import Header from "@/app/components/Header";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000";
+const API_BASE = process.env.BACKEND_URL ?? "http://localhost:5000";
 
 type Me = { id: number } | null;
 

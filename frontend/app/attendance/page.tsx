@@ -72,7 +72,7 @@ const keyOf = (d: Date) =>
 const monthKeyOf = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+  process.env.BACKEND_URL ?? "http://localhost:5000";
 
 function AttendancePageContent() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -151,7 +151,7 @@ function AttendancePageContent() {
       setError(null);
       try {
         const res = await fetch(
-          `${API_BASE}/attendance?date=${encodeURIComponent(dateKey)}`,
+          `${API_BASE}/api/attendance?date=${encodeURIComponent(dateKey)}`,
           { credentials: "include" }
         );
         if (!res.ok) throw new Error("Response not ok");
@@ -191,7 +191,7 @@ function AttendancePageContent() {
 
   const toggleStatus = async (childId: number) => {
     try {
-      const res = await fetch(`${API_BASE}/attendance`, {
+      const res = await fetch(`${API_BASE}/api/attendance`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -229,7 +229,7 @@ function AttendancePageContent() {
 
     try {
       const resJson = await fetch(
-        `${API_BASE}/attendance/report?month=${encodeURIComponent(monthKey)}`,
+        `${API_BASE}/api/attendance/report?month=${encodeURIComponent(monthKey)}`,
         { credentials: "include" }
       );
       if (!resJson.ok) throw new Error("JSON response not ok");
@@ -243,7 +243,7 @@ function AttendancePageContent() {
       setMonthlyReport(data);
 
       const resPdf = await fetch(
-        `${API_BASE}/attendance/report/pdf?month=${encodeURIComponent(
+        `${API_BASE}/api/attendance/report/pdf?month=${encodeURIComponent(
           monthKey
         )}`,
         { credentials: "include" }

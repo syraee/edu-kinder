@@ -1,18 +1,20 @@
 // app/meals/menu/page.tsx
 import Header from "@/app/components/Header";
 import MenuDisplay from "@/app/components/MenuDisplay";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 async function getUserSSR() {
   try {
-    const cookieHeader = cookies().toString();
+    const cookieHeader = (await headers()).get("cookie") ?? "";
     const backend = process.env.BACKEND_URL ?? "http://localhost:5000";
+
     const r = await fetch(`${backend}/api/auth/me`, {
       method: "GET",
       headers: { cookie: cookieHeader },
       cache: "no-store",
     });
+
     if (!r.ok) return null;
     const data = await r.json();
     return data?.user ?? null;

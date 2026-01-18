@@ -2,10 +2,10 @@
 
 import Header from "@/app/components/Header";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-const API_BASE =
-    process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+const FRONT_API_BASE = process.env.BACKEND_URL ?? "http://localhost:5000";
+const API_BASE = `${FRONT_API_BASE}/api`;
 
 type UserSummary = {
     id: number;
@@ -44,17 +44,17 @@ type ParsedChangeLogEntry = ChangeLogEntry & {
 };
 
 const FIELD_ORDER: { key: keyof PaymentSnapshot; label: string }[] = [
-    {key: "breakfastFee", label: "Raňajky"},
-    {key: "lunchFee", label: "Obed"},
-    {key: "snackFee", label: "Olovrant"},
-    {key: "tuitionFee", label: "Školné – interný"},
-    {key: "tuitionFeeExt", label: "Školné – externý"},
-    {key: "mealsIban", label: "IBAN – stravné"},
-    {key: "mealsVarSym", label: "Variabilný symbol – stravné"},
-    {key: "tuitionIban", label: "IBAN – školné"},
-    {key: "tuitionVarSym", label: "Variabilný symbol – školné"},
-    {key: "validFrom", label: "Platné od"},
-    {key: "validTo", label: "Platné do"},
+    { key: "breakfastFee", label: "Raňajky" },
+    { key: "lunchFee", label: "Obed" },
+    { key: "snackFee", label: "Olovrant" },
+    { key: "tuitionFee", label: "Školné – interný" },
+    { key: "tuitionFeeExt", label: "Školné – externý" },
+    { key: "mealsIban", label: "IBAN – stravné" },
+    { key: "mealsVarSym", label: "Variabilný symbol – stravné" },
+    { key: "tuitionIban", label: "IBAN – školné" },
+    { key: "tuitionVarSym", label: "Variabilný symbol – školné" },
+    { key: "validFrom", label: "Platné od" },
+    { key: "validTo", label: "Platné do" },
 ];
 
 function formatDateTime(iso: string) {
@@ -193,7 +193,7 @@ export default function ChangeLogPage() {
 
     return (
         <>
-            <Header/>
+            <Header />
             <div className="govuk-main-wrapper govuk-width-container idsk-docs">
                 <div className="idsk-docs__wrap">
                     <span className="idsk-docs__divider" aria-hidden="true"></span>
@@ -205,11 +205,16 @@ export default function ChangeLogPage() {
                         >
                             <ul className="idsk-docs__list govuk-list">
                                 <li className="idsk-docs__item">
-                                    <li className="idsk-docs__item">
-                                        <Link className="idsk-docs__link" href="/payment-management/payment-input-meals" title="Zápis platieb">
-                                            Zápis platieb - stravné
-                                        </Link>
-                                    </li>
+                                    <Link
+                                        className="idsk-docs__link"
+                                        href="/payment-management/payment-input-meals"
+                                        title="Zápis platieb"
+                                    >
+                                        Zápis platieb - stravné
+                                    </Link>
+                                </li>
+
+                                <li className="idsk-docs__item">
                                     <Link
                                         className="idsk-docs__link"
                                         href="/payment-management/payment-input-tuition"
@@ -218,6 +223,7 @@ export default function ChangeLogPage() {
                                         Zápis platieb - školné
                                     </Link>
                                 </li>
+
                                 <li className="idsk-docs__item">
                                     <Link
                                         className="idsk-docs__link"
@@ -227,6 +233,7 @@ export default function ChangeLogPage() {
                                         Fixné hodnoty za obedy/školné
                                     </Link>
                                 </li>
+
                                 <li className="idsk-docs__item">
                                     <Link
                                         className="idsk-docs__link is-active"
@@ -236,8 +243,8 @@ export default function ChangeLogPage() {
                                         História zmien
                                     </Link>
                                 </li>
-
                             </ul>
+
                         </aside>
                         <main className="idsk-docs__content payments">
                             <h1 className="govuk-heading-xl">História zmien</h1>
@@ -262,49 +269,49 @@ export default function ChangeLogPage() {
                             ) : (
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th className="govuk-table__header">Dátum a čas</th>
-                                        <th className="govuk-table__header">Používateľ</th>
-                                        <th className="govuk-table__header">Popis</th>
-                                        <th className="govuk-table__header">
-                                            Počet zmien
-                                        </th>
-                                        <th className="govuk-table__header">Detail</th>
-                                    </tr>
+                                        <tr className="govuk-table__row">
+                                            <th className="govuk-table__header">Dátum a čas</th>
+                                            <th className="govuk-table__header">Používateľ</th>
+                                            <th className="govuk-table__header">Popis</th>
+                                            <th className="govuk-table__header">
+                                                Počet zmien
+                                            </th>
+                                            <th className="govuk-table__header">Detail</th>
+                                        </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                    {logs.map((log) => {
-                                        const fullName =
-                                            (log.user.firstName ?? "") +
-                                            (log.user.lastName ? ` ${log.user.lastName}` : "");
-                                        const changedCount = countChangedFields(log);
+                                        {logs.map((log) => {
+                                            const fullName =
+                                                (log.user.firstName ?? "") +
+                                                (log.user.lastName ? ` ${log.user.lastName}` : "");
+                                            const changedCount = countChangedFields(log);
 
-                                        return (
-                                            <tr className="govuk-table__row" key={log.id}>
-                                                <td className="govuk-table__cell">
-                                                    {formatDateTime(log.changedAt)}
-                                                </td>
-                                                <td className="govuk-table__cell">
-                                                    {fullName || log.user.email}
-                                                </td>
-                                                <td className="govuk-table__cell">
-                                                    {log.description}
-                                                </td>
-                                                <td className="govuk-table__cell">
-                                                    {changedCount} položiek
-                                                </td>
-                                                <td className="govuk-table__cell">
-                                                    <button
-                                                        type="button"
-                                                        className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
-                                                        onClick={() => setSelected(log)}
-                                                    >
-                                                        Detail
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                            return (
+                                                <tr className="govuk-table__row" key={log.id}>
+                                                    <td className="govuk-table__cell">
+                                                        {formatDateTime(log.changedAt)}
+                                                    </td>
+                                                    <td className="govuk-table__cell">
+                                                        {fullName || log.user.email}
+                                                    </td>
+                                                    <td className="govuk-table__cell">
+                                                        {log.description}
+                                                    </td>
+                                                    <td className="govuk-table__cell">
+                                                        {changedCount} položiek
+                                                    </td>
+                                                    <td className="govuk-table__cell">
+                                                        <button
+                                                            type="button"
+                                                            className="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                                                            onClick={() => setSelected(log)}
+                                                        >
+                                                            Detail
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             )}
@@ -346,10 +353,10 @@ export default function ChangeLogPage() {
                             {selected.user.email
                                 ? ` (${selected.user.email})`
                                 : ""}
-                            <br/>
+                            <br />
                             <strong>Dátum a čas: </strong>
                             {formatDateTime(selected.changedAt)}
-                            <br/>
+                            <br />
                             <strong>Popis: </strong>
                             {selected.description}
                         </p>
@@ -358,7 +365,7 @@ export default function ChangeLogPage() {
                             <div className="govuk-grid-column-one-half">
                                 <h3 className="govuk-heading-m">Pred zmenou</h3>
                                 <dl className="govuk-summary-list">
-                                    {FIELD_ORDER.map(({key, label}) => {
+                                    {FIELD_ORDER.map(({ key, label }) => {
                                         const val = valueToDisplay(key, selected.oldParsed[key]);
                                         const changed = isFieldChanged(selected, key);
 
@@ -383,7 +390,7 @@ export default function ChangeLogPage() {
                             <div className="govuk-grid-column-one-half">
                                 <h3 className="govuk-heading-m">Po zmene</h3>
                                 <dl className="govuk-summary-list">
-                                    {FIELD_ORDER.map(({key, label}) => {
+                                    {FIELD_ORDER.map(({ key, label }) => {
                                         const val = valueToDisplay(key, selected.newParsed[key]);
                                         const changed = isFieldChanged(selected, key);
 
@@ -397,13 +404,13 @@ export default function ChangeLogPage() {
                                             >
                                                 <dt className="govuk-summary-list__key">{label}</dt>
                                                 <dd className="govuk-summary-list__value">
-              <span
-                  className={
-                      changed ? "payment-log-value--changed" : undefined
-                  }
-              >
-                {val || <span className="govuk-hint">–</span>}
-              </span>
+                                                    <span
+                                                        className={
+                                                            changed ? "payment-log-value--changed" : undefined
+                                                        }
+                                                    >
+                                                        {val || <span className="govuk-hint">–</span>}
+                                                    </span>
                                                 </dd>
                                             </div>
                                         );

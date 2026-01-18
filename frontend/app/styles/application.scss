@@ -317,26 +317,29 @@ $govuk-assets-path: "/idsk-assets/";
   .attendance-modal {
     position: fixed;
     inset: 0;
-    z-index: 60;
+    z-index: 6000;
 
-    .modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.3);
-    }
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 0;
+  }
 
-    .modal-card {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(880px, 92vw);
-      background: #fff;
-      border: 2px solid #1d4ed8;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
-    }
+  .modal-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(880px, 92vw);
+    background: #fff;
+    border: 2px solid #1d4ed8;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    z-index: 1;
+    pointer-events: auto;
+  }
 
     .modal-header {
       display: flex;

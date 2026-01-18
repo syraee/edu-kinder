@@ -7,7 +7,8 @@ import { useSearchParams } from "next/navigation";
 type Child = { id: number; firstName: string; lastName: string; birthDate: string };
 type FieldError = string | null;
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+const FRONT_API_BASE = process.env.BACKEND_URL ?? "http://localhost:5000";
+const API_BASE = `${FRONT_API_BASE}/api`;
 
 function isEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);

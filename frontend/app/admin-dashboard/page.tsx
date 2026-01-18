@@ -31,13 +31,13 @@ export default function InviteParentsPage() {
   const [sending, setSending] = useState(false);
   const [banner, setBanner] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+  const API_BASE = process.env.BACKEND_URL ?? "http://localhost:5000";
 
   // Načítanie detí z databázy
   useEffect(() => {
     async function fetchChildren() {
       try {
-        const res = await fetch(`${API_BASE}/child`, { credentials: "include" });
+        const res = await fetch(`${API_BASE}/api/child`, { credentials: "include" });
         const data = await res.json();
         if (data?.success && Array.isArray(data.data)) {
           setChildren(data.data);
@@ -86,7 +86,7 @@ export default function InviteParentsPage() {
 
     try {
       // Vytvorenie rodiča
-      const resUser = await fetch(`${API_BASE}/user`, {
+      const resUser = await fetch(`${API_BASE}/api/user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,7 +108,7 @@ export default function InviteParentsPage() {
 
       // Priradenie detí
       for (const childId of selectedChildren) {
-        await fetch(`${API_BASE}/guardian/assign`, {
+        await fetch(`${API_BASE}/api/guardian/assign`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -158,7 +158,7 @@ export default function InviteParentsPage() {
     try {
       setSending(true);
       const emails = addedParents.map(p => p.email);
-      const response = await fetch(`${API_BASE}/auth/register/request`, {
+      const response = await fetch(`${API_BASE}/api/auth/register/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emails }),

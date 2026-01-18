@@ -9,9 +9,9 @@ type Meals = Record<CourseKey, boolean>;
 type Child = { id: string; name: string };
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+  process.env.BACKEND_URL ?? "http://localhost:5000";
 
-const MY_CHILDREN_URL = `${API_BASE}/child/mine`;
+const MY_CHILDREN_URL = `${API_BASE}/api/child/mine`;
 
 const WEEKDAYS = ["Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok"];
 const MONTHS_SK = [
@@ -161,7 +161,7 @@ function Attendance() {
     const toKey = keyOf(to);
     const childIds = children.map((c) => c.id).join(",");
 
-    const url = `${API_BASE}/meals/attendance?from=${fromKey}&to=${toKey}&childIds=${encodeURIComponent(
+    const url = `${API_BASE}/api/meals/attendance?from=${fromKey}&to=${toKey}&childIds=${encodeURIComponent(
       childIds
     )}`;
 
@@ -248,7 +248,7 @@ function Attendance() {
         })),
       };
 
-      await fetch(`${API_BASE}/meals/attendance`, {
+      await fetch(`${API_BASE}/api/meals/attendance`, {
         method: "POST",
         credentials: "include",
         headers: {

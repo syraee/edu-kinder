@@ -3,7 +3,7 @@ const router = express.Router();
 const prisma = require("../../prisma/client");
 const authenticate = require("../middleware/authenticate");
 
-// ✅ GET /api/child – všetky deti s informáciami o triede
+
 router.get("/", async (req, res, next) => {
   try {
     const children = await prisma.child.findMany({

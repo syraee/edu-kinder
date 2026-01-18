@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Link from "next/link";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+const API_BASE = process.env.BACKEND_URL ?? "http://localhost:5000";
 
 type GroupTeacher = {
   id: number;
@@ -76,9 +76,9 @@ export default function StudentsPage() {
     async function loadData() {
       try {
         const [groupsRes, childrenRes, teachersRes] = await Promise.all([
-          fetch(`${API_BASE}/group`, { credentials: "include" }),
-          fetch(`${API_BASE}/child`, { credentials: "include" }),
-          fetch(`${API_BASE}/user/teachers`, { credentials: "include" }),
+          fetch(`${API_BASE}/api/group`, { credentials: "include" }),
+          fetch(`${API_BASE}/api/child`, { credentials: "include" }),
+          fetch(`${API_BASE}/api/user/teachers`, { credentials: "include" }),
         ]);
 
         const groupsData = await groupsRes.json();
@@ -149,7 +149,7 @@ export default function StudentsPage() {
     setBanner(null);
 
     try {
-      const res = await fetch(`${API_BASE}/child/${editingChild.id}`, {
+      const res = await fetch(`${API_BASE}/api/child/${editingChild.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editForm),
@@ -260,7 +260,7 @@ export default function StudentsPage() {
         teacherId: selectedTeacherId, // môže byť null
       };
 
-      const res = await fetch(`${API_BASE}/group/${editingGroup.id}`, {
+      const res = await fetch(`${API_BASE}/api/group/${editingGroup.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 
 type State = "default" | "sent" | "error";
 
-const API_BASE = "https://edu-kinder.onrender.com";
+const API_BASE = "http://localhost:5000";
 
 export default function PrihlaseniePage() {
   const [state, setState] = useState<State>("default");
@@ -45,7 +45,7 @@ export default function PrihlaseniePage() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE}/auth/login/request`, {
+      const res = await fetch(`${API_BASE}/api/auth/login/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: trimmed }),

@@ -15,13 +15,14 @@ export async function GET(req: Request) {
     method: "GET",
     cache: "no-store",
     redirect: "manual",
+    credentials: "include",
   });
 
   const response = NextResponse.redirect(new URL("/", req.url));
 
   // prekopíruj všetky Set-Cookie (môže ich byť viac)
   const setCookies = r.headers.getSetCookie?.() as string[] | undefined;
-
+  
   if (setCookies?.length) {
     for (const c of setCookies) response.headers.append("set-cookie", c);
   } else {

@@ -31,7 +31,7 @@ type Photo = {
 type Group = { id: number; name: string };
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+  process.env.BACKEND_URL ?? "http://localhost:5000";
 type User = { id: number; email: string; role: unknown } | null;
 
 export default function GalleryPage() {

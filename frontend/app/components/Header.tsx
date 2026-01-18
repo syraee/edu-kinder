@@ -158,7 +158,7 @@ export default function Header() {
                     >
                       <path
                         d="M20 14c0 1.1-.9 2-2 2H9l-4 4V6c0-1.1.9-2 2-2h11c1.1 0 2 .9 2 2v8z"
-                        stroke="var(--chat-icon-color)"
+                        stroke="currentColor"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"

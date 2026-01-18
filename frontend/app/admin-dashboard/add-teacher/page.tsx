@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import Header from "@/app/components/Header";
 import {set} from "immutable";
-
+import { API_BASE } from "@/lib/apiBase";
 interface AddedTeachers {
     id: number;
     email: string;
@@ -25,7 +25,7 @@ export default function InviteTeachersPage() {
     const [sending, setSending] = useState(false);
     const [banner, setBanner] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:5000/api";
+    const API_BASE = process.env.BACKEND_URL ?? "http://localhost:5000";
 
     const normalize = (v: string) => v.trim().toLowerCase();
     const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -57,7 +57,7 @@ export default function InviteTeachersPage() {
 
         //const fullFirstName = `${title.trim()} ${firstName.trim()}`.trim();
         try {
-            const resUser = await fetch(`${API_BASE}/user`, {
+            const resUser = await fetch(`${API_BASE}/api/user`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -108,7 +108,7 @@ export default function InviteTeachersPage() {
         if (!teacher) return;
 
         try {
-            const res = await fetch(`${API_BASE}/user/${teacher.id}`, {
+            const res = await fetch(`${API_BASE}/api/user/${teacher.id}`, {
                 method: "DELETE",
                 credentials: "include",
             });
@@ -138,7 +138,7 @@ export default function InviteTeachersPage() {
         try {
             setSending(true);
             const emails = addedTeachers.map(p => p.email);
-            const response = await fetch(`${API_BASE}/auth/register/request`, {
+            const response = await fetch(`${API_BASE}/api/auth/register/request`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ emails }),
