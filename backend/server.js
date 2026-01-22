@@ -42,10 +42,16 @@ app.use((req, res, next) => {
 
 // Loguj hneď na začiatku
 app.use((req, _res, next) => {
-  console.log(req.method, req.path, "origin:", req.headers.origin || "-");
+  console.log(
+    req.method,
+    req.path,
+    "origin:",
+    req.headers.origin || "-",
+    "cookieHeader:",
+    req.headers.cookie ? "YES" : "NO"
+  );
   next();
 });
-
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
