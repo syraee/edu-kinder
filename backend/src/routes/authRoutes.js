@@ -16,7 +16,7 @@ function normalizeBaseUrl(url) {
   return String(url).trim().replace(/\/+$/, "");
 }
 
-const FRONTEND_URL = "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL;
 const BACKEND_URL = normalizeBaseUrl(process.env.BACKEND_URL) || "http://localhost:5000";
 
 // --- helpers for building links ---
