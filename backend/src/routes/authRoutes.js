@@ -272,7 +272,7 @@ router.post("/login/verify", async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        return res.redirect(303, "http://localhost:3000/");
+        return res.redirect(303, frontend("/"));
     } catch (err) {
         console.error(err);
         return res.status(401).json({error: "Neplatný alebo expirovaný token."});
