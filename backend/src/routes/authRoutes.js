@@ -22,11 +22,6 @@ const BACKEND_URL = normalizeBaseUrl(process.env.BACKEND_URL) || "http://localho
 /**
  * -------------------------------------------------------------
  * DYNAMICKÁ DETEKCIA URL
- * Zistí, kam má smerovať odkaz v maily podľa toho, kto backend volá.
- * Priorita: 
- * 1. x-forwarded-host (volanie z tvojho Next.js serverApiFetch)
- * 2. origin/referer (priame volanie z prehliadača)
- * 3. Fallback na FRONTEND_URL (.env)
  * -------------------------------------------------------------
  */
 function getDynamicFrontendUrl(req) {
@@ -34,12 +29,10 @@ function getDynamicFrontendUrl(req) {
   const origin = req.headers.origin || "";
   const referer = req.headers.referer || "";
 
-  // 1. Z hlavičky, ktorú sme ručne pridali do Next.js
   if (forwardedHost && forwardedHost.includes("localhost")) {
     return normalizeBaseUrl(forwardedHost);
   }
 
-  // 2. Ak príde požiadavka z prehliadača
   const source = origin.includes("localhost") ? origin : (referer.includes("localhost") ? referer : null);
   if (source) {
     try {
@@ -50,11 +43,9 @@ function getDynamicFrontendUrl(req) {
     }
   }
 
-  // 3. Predvolená produkcia (edukinder.sk)
   return FRONTEND_URL;
 }
 
-// Pomocná funkcia pre stavanie bezpečných linkov
 function buildUrl(baseUrl, path = "/") {
   const p = String(path || "/");
   return `${normalizeBaseUrl(baseUrl)}${p.startsWith("/") ? "" : "/"}${p}`;
@@ -62,24 +53,21 @@ function buildUrl(baseUrl, path = "/") {
 
 /**
  * -------------------------------------------------------------
- * COOKIE OPTIONS (Dôležité pre localhost vývoj proti Renderu)
+ * COOKIE OPTIONS
  * -------------------------------------------------------------
  */
 function cookieBaseOptions(req) {
   const isProd = process.env.NODE_ENV === "production";
-  
   const forwardedHost = req?.headers["x-forwarded-host"] || "";
   const origin = req?.headers.origin || "";
   const referer = req?.headers.referer || "";
   
-  // Ak sa backend rozpráva s localhostom, musíme vypnúť 'secure', 
-  // inak prehliadač cookie odmietne prijať (lebo localhost nemá HTTPS)
   const isLocal = forwardedHost.includes("localhost") || origin.includes("localhost") || referer.includes("localhost");
 
   return {
     httpOnly: true,
     secure: isLocal ? false : isProd, 
-    sameSite: isLocal ? "lax" : "none", // V produkcii medzi 2 doménami (render/vercel) musí byť "none" a secure: true
+    sameSite: isLocal ? "lax" : "none",
     path: "/",
   };
 }
@@ -92,7 +80,6 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
     return res.status(400).json({ error: "Zoznam emailov je prázdny alebo neplatný." });
   }
 
-  // Dynamicky zistíme, aký je frontend pre tento request
   const dynamicBase = getDynamicFrontendUrl(req);
   const results = { sent: [], skipped: [], failed: [] };
 
@@ -105,8 +92,6 @@ router.post("/register/request", authenticate, authorize(["Admin"]), async (req,
       }
 
       const token = generateToken(existing.id, email, existing.roleId, "registration", "3d");
-      
-      // Vytvorenie dynamického odkazu na registráciu
       const regLink = buildUrl(dynamicBase, `/register?token=${encodeURIComponent(token)}`);
       
       await sendInvitationMail(email, regLink); 
@@ -178,10 +163,16 @@ router.get("/me", authenticate, (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  // Odošleme req do cookie funkcie pre prípad, že si na localhoste
   const base = cookieBaseOptions(req);
+  
+  // ✅ POUŽITIE clearCookie PRE BEZPEČNÉ VYMAZANIE
+  res.clearCookie("accessToken", base);
+  res.clearCookie("refreshToken", base);
+
+  // Fallback (pre istotu)
   res.cookie("accessToken", "", { ...base, maxAge: 0 });
   res.cookie("refreshToken", "", { ...base, maxAge: 0 });
+  
   return res.json({ ok: true });
 });
 
@@ -196,10 +187,7 @@ router.post("/login/request", async (req, res) => {
 
   const token = generateToken(loginUser.id, loginUser.email, loginUser.roleId, "login", "15m");
 
-  // ✅ Tu sa udeje mágia. Zistí či prišiel dopyt z edukinder.sk alebo z localhostu
   const dynamicBase = getDynamicFrontendUrl(req);
-  
-  // ✅ Link sa pošle dynamicky s ohľadom na prostredie
   const link = buildUrl(dynamicBase, `/api/auth/login/verify?token=${encodeURIComponent(token)}`);
 
   console.log("[LOGIN LINK VYTVORENY PRE]:", link);
@@ -223,13 +211,11 @@ router.get("/login/verify", async (req, res) => {
     const accessToken = generateToken(user.id, user.email, user.role, "access", "2h");
     const refreshToken = generateToken(user.id, user.email, user.role, "refresh", "7d");
 
-    // Nastavíme cookies s ohľadom na prostredie
     const base = cookieBaseOptions(req);
 
     res.cookie("refreshToken", refreshToken, { ...base, maxAge: 7 * 24 * 60 * 60 * 1000 });
     res.cookie("accessToken", accessToken, { ...base, maxAge: 2 * 60 * 60 * 1000 });
 
-    // Kam presmerovať užívateľa po úspešnom prihlásení
     const dynamicBase = getDynamicFrontendUrl(req);
     return res.redirect(303, buildUrl(dynamicBase, "/"));
   } catch (err) {
@@ -254,8 +240,14 @@ router.post("/refresh", async (req, res) => {
     return res.json({ success: true });
   } catch (err) {
     const base = cookieBaseOptions(req);
+    
+    // ✅ POUŽITIE clearCookie AJ PRI ZLYHANÍ REFRESHU
+    res.clearCookie("accessToken", base);
+    res.clearCookie("refreshToken", base);
+
     res.cookie("accessToken", "", { ...base, maxAge: 0 });
     res.cookie("refreshToken", "", { ...base, maxAge: 0 });
+    
     return res.status(401).json({ error: "Invalid refresh token" });
   }
 });
