@@ -29,10 +29,14 @@ function getDynamicFrontendUrl(req) {
   const origin = req.headers.origin || "";
   const referer = req.headers.referer || "";
 
+  // 1. Z hlavičky, ktorú preposiela Next.js Proxy
   if (forwardedHost && forwardedHost.includes("localhost")) {
-    return normalizeBaseUrl(forwardedHost);
+    const cleanHost = normalizeBaseUrl(forwardedHost);
+    // OPRAVA: Musíme pridať http:// ak tam chýba, inak emailový klient zablokuje link!
+    return cleanHost.startsWith("http") ? cleanHost : `http://${cleanHost}`;
   }
 
+  // 2. Ak príde požiadavka z prehliadača (origin/referer už zväčša majú http://)
   const source = origin.includes("localhost") ? origin : (referer.includes("localhost") ? referer : null);
   if (source) {
     try {
@@ -43,6 +47,7 @@ function getDynamicFrontendUrl(req) {
     }
   }
 
+  // 3. Predvolená produkcia (napr. https://edukinder.sk) z .env
   return FRONTEND_URL;
 }
 
